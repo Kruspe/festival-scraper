@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Wacken scrapper resources
+Parameters:
+  FestivalBucketArn:
+    Type: AWS::SSM::Parameter::Value<String>
+  FestivalBucketName:
+    Type: AWS::SSM::Parameter::Value<String>
+  ParamDeploymentBucketName:
+    Type: AWS::SSM::Parameter::Value<String>
+  ParamWackenVersion:
+    Type: String
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+      - PolicyName: UploadToS3
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action: 's3:PutObject'
+            Resource: !Join [ "", [ !Ref FestivalBucketArn, "/wacken.json" ] ]
+      - PolicyName: GetSsmParameters
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action: 'ssm:GetParameters'
+            Resource:
+            - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/spotify/client-id
+            - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/spotify/client-secret
+  InvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: 'events.amazonaws.com'
+      SourceArn: !GetAtt [ LambdaCronJob, Arn ]
+      FunctionName: !Ref Lambda
+  Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: wackenArtists
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt [ LambdaExecutionRole, Arn ]
+      Timeout: 60
+      Environment:
+        Variables:
+          FESTIVAL_ARTISTS_BUCKET: !Ref FestivalBucketName
+          SPOTIFY_CLIENT_ID_PARAMETER_NAME: /spotify/client-id
+          SPOTIFY_CLIENT_SECRET_PARAMETER_NAME: /spotify/client-secret
+      Code:
+        S3Bucket: !Ref ParamDeploymentBucketName
+        S3Key: wacken.zip
+        S3ObjectVersion: !Ref ParamWackenVersion
+
+  CronJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - events.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ExecuteWackenArtistsLambda
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action: 'lambda:InvokeFunction'
+            Resource: !GetAtt [ Lambda, Arn ]
+  LambdaCronJob:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: WackenArtistsLamdaTrigger
+      ScheduleExpression: cron(0 9,20 * * ? *)
+      RoleArn: !GetAtt [ CronJobRole, Arn ]
+      Targets:
+      - Arn: !GetAtt [ Lambda, Arn ]
+        Id: "Wacken-Artists-Lambda"

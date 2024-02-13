@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "*"
+boto3 = "*"
+beautifulsoup4 = "*"
+
+[dev-packages]
+responses = "*"
+pytest = "*"
+boto3-stubs = {extras = ["ssm", "s3"], version = "*"}
+moto = {extras = ["s3", "ssm"], version = "*"}
+
+[requires]
+python_version = "3.12"
