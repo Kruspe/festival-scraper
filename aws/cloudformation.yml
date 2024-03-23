@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Wacken scrapper resources
+Description: Festival scraper resources
 Parameters:
   FestivalBucketArn:
     Type: AWS::SSM::Parameter::Value<String>

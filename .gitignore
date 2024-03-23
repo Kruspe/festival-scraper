@@ -1,5 +1,14 @@
-dist
+# python generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# venv
+.venv
+
 .DS_Store
 .idea
 *.iml
-__pycache__

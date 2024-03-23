@@ -14,7 +14,11 @@ def test_get_wacken_artists():
     metal_disco = {"artist": {"title": "Metal Disco"}}
     metal_yoga = {"artist": {"title": "Metal Yoga"}}
     artists = [bloodbath, megadeth, vader, metal_disco, metal_yoga]
-    expected_artist_names = [bloodbath["artist"]["title"], megadeth["artist"]["title"], vader["artist"]["title"]]
+    expected_artist_names = [
+        bloodbath["artist"]["title"],
+        megadeth["artist"]["title"],
+        vader["artist"]["title"],
+    ]
 
     responses.add(responses.GET, wacken_url, json=artists, status=200)
 

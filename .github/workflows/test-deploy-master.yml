@@ -1,0 +1,48 @@
+name: Test and Deploy
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkoout
+        uses: actions/checkout@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test
+        run: |
+          curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+          task ci
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy Lambda
+        run: |
+          curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile music-rating
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile music-rating
+          task deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.LAMBDA_DEPLOY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LAMBDA_DEPLOY_ACCESS_KEY_SECRET }}
+          AWS_DEFAULT_REGION: eu-west-1

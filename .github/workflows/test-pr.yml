@@ -1,0 +1,26 @@
+name: Test-PR
+on:
+  pull_request:
+    types:
+    - opened
+    - edited
+    - synchronize
+    - reopened
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Install Task
+      uses: arduino/setup-task@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Test
+      run: |
+        curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+        task ci

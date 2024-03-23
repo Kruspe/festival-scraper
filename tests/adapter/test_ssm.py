@@ -11,7 +11,9 @@ def test_ssm_get_parameters_returns_parameter_values():
     ssm_client.put_parameter(Name="parameter2", Value="value2", Type="SecureString")
 
     ssm = Ssm(ssm_client=ssm_client)
-    response = ssm.get_parameters(parameter_names=["parameter1", "parameter2", "invalid"])
+    response = ssm.get_parameters(
+        parameter_names=["parameter1", "parameter2", "invalid"]
+    )
     assert response == {
         "parameter1": "value1",
         "parameter2": "value2",

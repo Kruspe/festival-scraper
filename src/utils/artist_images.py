@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 import os
 from base64 import b64encode
@@ -6,6 +7,7 @@ from typing import List, Dict
 
 import requests
 
+from src.adapter.s3 import S3
 from src.adapter.ssm import Ssm
 
 
@@ -33,9 +35,10 @@ def _get_images_with_size_greater_300(artist):
     )
 
 
-class ArtistImages:
-    def __init__(self, *, ssm: Ssm) -> None:
+class Helper:
+    def __init__(self, *, ssm: Ssm, s3: S3) -> None:
         self.ssm = ssm
+        self.s3 = s3
 
     def get_images(self, *, artist_names: List[str]) -> Dict:
         if len(artist_names) == 0:
@@ -48,9 +51,7 @@ class ArtistImages:
             search_response = requests.get(
                 "https://api.spotify.com/v1/search",
                 {"type": "artist", "limit": 5, "q": artist},
-                headers={
-                    "Authorization": "Bearer " + spotify_token
-                },
+                headers={"Authorization": "Bearer " + spotify_token},
             )
             search_response_status_code = search_response.status_code
             search_response_json = search_response.json()
@@ -69,15 +70,11 @@ class ArtistImages:
                 artist_images[artist] = None
                 continue
 
-            matching_artists = _find_artists_with_matching_name(
-                found_artists, artist
-            )
+            matching_artists = _find_artists_with_matching_name(found_artists, artist)
             if len(matching_artists) == 0:
                 artist_images[artist] = None
                 continue
-            matching_artists_with_images = _find_artists_with_images(
-                matching_artists
-            )
+            matching_artists_with_images = _find_artists_with_images(matching_artists)
             if len(matching_artists_with_images) == 0:
                 artist_images[artist] = None
                 continue
@@ -92,9 +89,20 @@ class ArtistImages:
 
             artist_images[artist] = artist_images_with_correct_size[
                 amount_of_images - 1
-                ]["url"]
+            ]["url"]
 
         return artist_images
+
+    def upload(self, *, artist_images: Dict[str, str], festival_name: str):
+        if artist_images:
+            result = []
+            for artist, image in artist_images.items():
+                result.append({"artist": artist, "image": image})
+            self.s3.upload(
+                bucket_name=os.getenv("FESTIVAL_ARTISTS_BUCKET"),
+                key=f"{festival_name}.json",
+                json=json.dumps(result),
+            )
 
     def _get_spotify_token(self) -> str:
         spotify_client_id_parameter_name = os.environ[
@@ -111,9 +119,9 @@ class ArtistImages:
         )
         encoded_spotify_basic_auth = "Basic " + b64encode(
             (
-                    spotify_secrets[spotify_client_id_parameter_name]
-                    + ":"
-                    + spotify_secrets[spotify_client_secret_parameter_name]
+                spotify_secrets[spotify_client_id_parameter_name]
+                + ":"
+                + spotify_secrets[spotify_client_secret_parameter_name]
             ).encode()
         ).decode("utf-8")
         spotify_token_response = requests.post(

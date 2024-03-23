@@ -1,14 +1,37 @@
 version: '3'
 
 tasks:
-  deploy-wacken:
-    desc: Deploy WackenArtists lambda
-    deps: [build-wacken]
-    dir: aws
+  install:
+    desc: Install all dependencies
+    cmds: [ rye sync ]
+  format:
     cmds:
-    - task: deploy-wacken-to-aws
+    - rye lint
+    - rye fmt
+  test:
+    desc: Run all tests
+    cmds: [ rye run pytest ]
+  build:
+    desc: Build and zip everything for a lambda deployment
+    cmds:
+      - rm -rf dist
+      - pip install --target ./dist -r requirements.lock
+      - task: zip
+      - zip -r dist/wacken.zip src
+      - zip -r dist/wacken.zip handler.py
+  zip:
+    dir: dist
+    cmds:
+      - zip -r wacken.zip .
 
-  deploy-wacken-to-aws:
+  ci:
+    deps: [ install ]
+    cmds:
+    - task: format
+    - task: test
+
+  deploy:
+    deps: [ build ]
     dir: aws
     cmds:
     - aws cloudformation deploy --template-file cloudformation.yml --stack-name WackenArtists --capabilities CAPABILITY_NAMED_IAM
@@ -21,16 +44,4 @@ tasks:
     vars:
       WACKEN_VERSION_ID:
         sh: aws s3api put-object --bucket music-rating-deployment-bucket --key wacken.zip --body ../dist/wacken.zip --profile music-rating | jq -r .VersionId
-  build-wacken:
-    cmds:
-    - rm -rf dist
-    - pipenv install
-    - pip install --target dist requests boto3
-    - task: zip-dependencies
-    - zip -r dist/wacken.zip wacken_bands
-    - zip -r dist/wacken.zip index.py
-  zip-dependencies:
-    dir: dist
-    cmds:
-    - pwd
-    - zip -r wacken.zip .
+
