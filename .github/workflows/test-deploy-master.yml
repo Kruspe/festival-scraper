@@ -21,6 +21,7 @@ jobs:
       - name: Test
         run: |
           curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+          echo "$HOME/.rye/shims" >> $GITHUB_PATH
           task ci
   deploy:
     needs: test
@@ -39,6 +40,7 @@ jobs:
       - name: Deploy Lambda
         run: |
           curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+          echo "$HOME/.rye/shims" >> $GITHUB_PATH
           aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile music-rating
           aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile music-rating
           task deploy
