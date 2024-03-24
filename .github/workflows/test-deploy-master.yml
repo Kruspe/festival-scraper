@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Test
@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy Lambda
