@@ -32,8 +32,6 @@ idna==3.6
 jmespath==1.0.1
     # via boto3
     # via botocore
-pip==24.0
-    # via festival-scraper
 python-dateutil==2.9.0.post0
     # via botocore
 s3transfer==0.10.0
