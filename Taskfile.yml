@@ -33,8 +33,11 @@ tasks:
   deploy:
     deps: [ build ]
     dir: aws
+    cmds: [ task: deploy-to-aws ]
+  deploy-to-aws:
+    dir: aws
     cmds:
-    - aws cloudformation deploy --template-file cloudformation.yml --stack-name WackenArtists --capabilities CAPABILITY_NAMED_IAM
+    - aws cloudformation deploy --template-file cloudformation.yml --stack-name FestivalScraper --capabilities CAPABILITY_NAMED_IAM
       --parameter-overrides
       ParamFestivalBucketArn=/festival-bucket/arn
       ParamFestivalBucketName=/festival-bucket/name
