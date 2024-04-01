@@ -8,6 +8,8 @@
 #   with-sources: false
 
 -e file:.
+anyio==4.3.0
+    # via httpx
 beautifulsoup4==4.12.3
     # via festival-scraper
 boto3==1.34.60
@@ -16,11 +18,17 @@ botocore==1.34.60
     # via boto3
     # via s3transfer
 certifi==2024.2.2
-    # via requests
-charset-normalizer==3.3.2
-    # via requests
+    # via httpcore
+    # via httpx
+h11==0.14.0
+    # via httpcore
+httpcore==1.0.5
+    # via httpx
+httpx==0.27.0
+    # via festival-scraper
 idna==3.6
-    # via requests
+    # via anyio
+    # via httpx
 jmespath==1.0.1
     # via boto3
     # via botocore
@@ -28,14 +36,14 @@ pip==24.0
     # via festival-scraper
 python-dateutil==2.9.0.post0
     # via botocore
-requests==2.31.0
-    # via festival-scraper
 s3transfer==0.10.0
     # via boto3
 six==1.16.0
     # via python-dateutil
+sniffio==1.3.1
+    # via anyio
+    # via httpx
 soupsieve==2.5
     # via beautifulsoup4
 urllib3==2.0.7
     # via botocore
-    # via requests

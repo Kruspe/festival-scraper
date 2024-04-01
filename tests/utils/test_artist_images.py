@@ -6,13 +6,12 @@ from typing import Union
 from unittest.mock import Mock, create_autospec
 
 import pytest
-import responses
 
 from src.adapter.s3 import S3
 from src.adapter.ssm import Ssm
 from src.utils.artist_images import Helper, SpotifyException
 
-spotify_token_endpoint = "https://accounts.spotify.com/api/token"
+url = spotify_token_endpoint = "https://accounts.spotify.com/api/token"
 spotify_token_response = {
     "access_token": "token",
     "token_type": "bearer",
@@ -61,26 +60,27 @@ def bucket_env():
     del os.environ["FESTIVAL_ARTISTS_BUCKET"]
 
 
-def test_get_images_with_empty_list_empty_dict(artist_images):
-    images = artist_images.get_images(artist_names=[])
+@pytest.mark.asyncio
+async def test_get_images_with_empty_list_empty_dict(artist_images, httpx_mock):
+    images = await artist_images.get_images(artist_names=[])
     assert images == {}
-    assert len(responses.calls) == 0
+    assert len(httpx_mock.get_requests()) == 0
 
 
-@responses.activate
-def test_get_images_raises_and_logs_exception_when_getting_token_fails(
-    caplog, artist_images, spotify_envs
+@pytest.mark.asyncio
+async def test_get_images_raises_and_logs_exception_when_getting_token_fails(
+    caplog, artist_images, spotify_envs, httpx_mock
 ):
     error_message = {"error": "error"}
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=error_message, status=500
+    httpx_mock.add_response(
+        method="POST", url=spotify_token_endpoint, json=error_message, status_code=500
     )
 
     with pytest.raises(SpotifyException):
-        artist_images.get_images(artist_names=["Bloodbath"])
+        await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 1
-    assert responses.calls[0].request.url == spotify_token_endpoint
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == spotify_token_endpoint
 
     assert len(caplog.records) == 1
     for record in caplog.records:
@@ -91,28 +91,32 @@ def test_get_images_raises_and_logs_exception_when_getting_token_fails(
         assert record.getMessage() == expected_log_message
 
 
-@responses.activate
-def test_get_images_raises_and_logs_exception_when_search_fails(
-    caplog, artist_images, spotify_envs
+@pytest.mark.asyncio
+async def test_get_images_raises_and_logs_exception_when_search_fails(
+    caplog, artist_images, spotify_envs, httpx_mock
 ):
     error_message = {"error": "error"}
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=error_message,
-        status=500,
+        status_code=500,
     )
 
     with pytest.raises(SpotifyException):
-        artist_images.get_images(artist_names=["Bloodbath"])
+        await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
-    assert responses.calls[0].request.url == spotify_token_endpoint
+    assert len(httpx_mock.get_requests()) == 2
+    print(httpx_mock.get_requests()[0].url)
+    assert httpx_mock.get_requests()[0].url == spotify_token_endpoint
     assert (
-        responses.calls[1].request.url
+        httpx_mock.get_requests()[1].url
         == "https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath"
     )
 
@@ -124,55 +128,62 @@ def test_get_images_raises_and_logs_exception_when_search_fails(
         )
 
 
-@responses.activate
-def test_get_images_endpoints_get_called_correctly(artist_images, spotify_envs):
+@pytest.mark.asyncio
+async def test_get_images_endpoints_get_called_correctly(
+    artist_images, spotify_envs, httpx_mock
+):
     authorization_header_key = "Authorization"
     authorization_header_value = (
         f"Basic {b64encode(b'client_id:client_secret').decode('utf-8')}"
     )
     content_type_header_key = "Content-Type"
     content_type_header_value = "application/x-www-form-urlencoded"
-    expected_body = "grant_type=client_credentials"
+    expected_body = b'"grant_type=client_credentials"'
 
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=bloodbath_search_response,
-        status=200,
+        status_code=200,
     )
 
-    artist_images.get_images(artist_names=["Bloodbath"])
+    await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
-    assert responses.calls[0].request.url == spotify_token_endpoint
+    assert len(httpx_mock.get_requests()) == 2
+    assert httpx_mock.get_requests()[0].url == spotify_token_endpoint
     assert (
-        responses.calls[1].request.url
+        httpx_mock.get_requests()[1].url
         == "https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath"
     )
 
-    assert responses.calls[0].request.body == expected_body
-    assert authorization_header_key in responses.calls[0].request.headers
-    assert content_type_header_key in responses.calls[0].request.headers
+    assert httpx_mock.get_requests()[0].content == expected_body
+    assert authorization_header_key in httpx_mock.get_requests()[0].headers
+    assert content_type_header_key in httpx_mock.get_requests()[0].headers
     assert (
-        responses.calls[0].request.headers[authorization_header_key]
+        httpx_mock.get_requests()[0].headers[authorization_header_key]
         == authorization_header_value
     )
     assert (
-        responses.calls[0].request.headers[content_type_header_key]
+        httpx_mock.get_requests()[0].headers[content_type_header_key]
         == content_type_header_value
     )
 
-    assert authorization_header_key in responses.calls[1].request.headers
+    assert authorization_header_key in httpx_mock.get_requests()[1].headers
     assert (
-        responses.calls[1].request.headers[authorization_header_key] == "Bearer token"
+        httpx_mock.get_requests()[1].headers[authorization_header_key] == "Bearer token"
     )
 
 
-@responses.activate
-def test_get_images_returns_correct_images_for_two_bands(artist_images, spotify_envs):
+@pytest.mark.asyncio
+async def test_get_images_returns_correct_images_for_two_bands(
+    artist_images, spotify_envs, httpx_mock
+):
     expected_megadeth_image_url = "https://megadeth_image.com"
     megadeth_search_response = copy.deepcopy(bloodbath_search_response)
     megadeth_search_response["artists"]["items"][0]["name"] = "Megadeth"
@@ -180,25 +191,28 @@ def test_get_images_returns_correct_images_for_two_bands(artist_images, spotify_
         expected_megadeth_image_url
     )
 
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=bloodbath_search_response,
-        status=200,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Megadeth",
         json=megadeth_search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Bloodbath", "Megadeth"])
+    images = await artist_images.get_images(artist_names=["Bloodbath", "Megadeth"])
 
-    assert len(responses.calls) == 3
+    assert len(httpx_mock.get_requests()) == 3
 
     assert images == {
         "Bloodbath": expected_bloodbath_image_url,
@@ -206,32 +220,37 @@ def test_get_images_returns_correct_images_for_two_bands(artist_images, spotify_
     }
 
 
-@responses.activate
-def test_get_images_returns_none_when_no_artist_was_found(artist_images, spotify_envs):
+@pytest.mark.asyncio
+async def test_get_images_returns_none_when_no_artist_was_found(
+    artist_images, spotify_envs, httpx_mock
+):
     search_response = {
         "artists": {
             "items": [],
         }
     }
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Bloodbath"])
+    images = await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
     assert images == {"Bloodbath": None}
 
 
-@responses.activate
-def test_get_images_returns_none_when_no_name_matches_search(
-    artist_images, spotify_envs
+@pytest.mark.asyncio
+async def test_get_images_returns_none_when_no_name_matches_search(
+    artist_images, spotify_envs, httpx_mock
 ):
     search_response = {
         "artists": {
@@ -243,24 +262,29 @@ def test_get_images_returns_none_when_no_name_matches_search(
             ],
         }
     }
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Attic",
         json=search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Attic"])
+    images = await artist_images.get_images(artist_names=["Attic"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
     assert images == {"Attic": None}
 
 
-@responses.activate
-def test_get_images_returns_first_image_for_matching_name(artist_images, spotify_envs):
+@pytest.mark.asyncio
+async def test_get_images_returns_first_image_for_matching_name(
+    artist_images, spotify_envs, httpx_mock
+):
     expected_image_url = "https://expected_image.com"
     search_response_with_two_name_matches = copy.deepcopy(bloodbath_search_response)
     search_response_with_two_name_matches["artists"]["items"][0]["images"][0]["url"] = (
@@ -275,26 +299,29 @@ def test_get_images_returns_first_image_for_matching_name(artist_images, spotify
         }
     )
 
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=search_response_with_two_name_matches,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Bloodbath"])
+    images = await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
 
     assert images == {"Bloodbath": expected_image_url}
 
 
-@responses.activate
-def test_get_images_returns_first_image_that_is_greater_than_400_in_width_and_height(
-    artist_images, spotify_envs
+@pytest.mark.asyncio
+async def test_get_images_returns_first_image_that_is_greater_than_400_in_width_and_height(
+    artist_images, spotify_envs, httpx_mock
 ):
     search_response = {
         "artists": {
@@ -328,25 +355,28 @@ def test_get_images_returns_first_image_that_is_greater_than_400_in_width_and_he
         }
     }
 
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Bloodbath"])
+    images = await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
     assert images == {"Bloodbath": expected_bloodbath_image_url}
 
 
-@responses.activate
-def test_get_images_returns_none_when_no_image_bigger_than_299_was_found(
-    artist_images, spotify_envs
+@pytest.mark.asyncio
+async def test_get_images_returns_none_when_no_image_bigger_than_299_was_found(
+    artist_images, spotify_envs, httpx_mock
 ):
     search_response = {
         "artists": {
@@ -364,24 +394,29 @@ def test_get_images_returns_none_when_no_image_bigger_than_299_was_found(
             ],
         }
     }
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Bloodbath"])
+    images = await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
     assert images == {"Bloodbath": None}
 
 
-@responses.activate
-def test_get_images_returns_none_when_no_images_were_found(artist_images, spotify_envs):
+@pytest.mark.asyncio
+async def test_get_images_returns_none_when_no_images_were_found(
+    artist_images, spotify_envs, httpx_mock
+):
     search_response = {
         "artists": {
             "items": [
@@ -392,24 +427,29 @@ def test_get_images_returns_none_when_no_images_were_found(artist_images, spotif
             ],
         }
     }
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
         json=search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Bloodbath"])
+    images = await artist_images.get_images(artist_names=["Bloodbath"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
     assert images == {"Bloodbath": None}
 
 
-@responses.activate
-def test_get_images_returns_image_only_for_matching_name(artist_images, spotify_envs):
+@pytest.mark.asyncio
+async def test_get_images_returns_image_only_for_matching_name(
+    artist_images, spotify_envs, httpx_mock
+):
     expected_image_url = "https://attic_image.com"
     search_response = {
         "artists": {
@@ -439,19 +479,22 @@ def test_get_images_returns_image_only_for_matching_name(artist_images, spotify_
             ],
         }
     }
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://api.spotify.com/v1/search",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Attic",
         json=search_response,
-        status=200,
+        status_code=200,
     )
 
-    images = artist_images.get_images(artist_names=["Attic"])
+    images = await artist_images.get_images(artist_names=["Attic"])
 
-    assert len(responses.calls) == 2
+    assert len(httpx_mock.get_requests()) == 2
     assert images == {"Attic": expected_image_url}
 
 

@@ -1,3 +1,5 @@
+import asyncio
+
 import boto3
 
 from src.adapter.s3 import S3
@@ -12,8 +14,8 @@ def handler(event, context):
 
     helper = Helper(ssm=Ssm(ssm_client=ssm_client), s3=S3(s3_client=s3_client))
 
-    wacken_artists = helper.get_images(artist_names=get_wacken_artists())
+    wacken_artists = asyncio.run(helper.get_images(artist_names=get_wacken_artists()))
     helper.upload(artist_images=wacken_artists, festival_name="wacken")
 
-    dong_artists = helper.get_images(artist_names=get_dong_artists())
+    dong_artists = asyncio.run(helper.get_images(artist_names=get_dong_artists()))
     helper.upload(artist_images=dong_artists, festival_name="dong")

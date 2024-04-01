@@ -1,12 +1,10 @@
-import requests
+import httpx
 from bs4 import BeautifulSoup
 
 
 def get_wacken_artists():
     artist_names = []
-    response = requests.get(
-        "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
-    )
+    response = httpx.get("https://www.wacken.com/fileadmin/Json/bandlist-concert.json")
 
     if response.status_code == 200:
         artists = response.json()
@@ -21,7 +19,7 @@ def get_wacken_artists():
 
 def get_dong_artists():
     artist_names = []
-    response = requests.get("https://www.dongopenair.de/de/bands/index")
+    response = httpx.get("https://www.dongopenair.de/de/bands/index")
 
     if response.status_code == 200:
         parsed_html = BeautifulSoup(response.text)

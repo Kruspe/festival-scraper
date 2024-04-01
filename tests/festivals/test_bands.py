@@ -1,13 +1,10 @@
-import responses
-
 from src.festivals.bands import get_wacken_artists, get_dong_artists
 
 wacken_url = "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
 dong_url = "https://www.dongopenair.de/de/bands/index"
 
 
-@responses.activate
-def test_get_wacken_artists():
+def test_get_wacken_artists(httpx_mock):
     bloodbath = {"artist": {"title": "Bloodbath"}}
     megadeth = {"artist": {"title": "Megadeth"}}
     vader = {"artist": {"title": "Vader"}}
@@ -20,28 +17,26 @@ def test_get_wacken_artists():
         vader["artist"]["title"],
     ]
 
-    responses.add(responses.GET, wacken_url, json=artists, status=200)
+    httpx_mock.add_response(method="GET", url=wacken_url, json=artists, status_code=200)
 
     artists = get_wacken_artists()
 
     assert artists == expected_artist_names
-    assert len(responses.calls) == 1
-    assert responses.calls[0].request.url == wacken_url
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == wacken_url
 
 
-@responses.activate
-def test_get_wacken_artists_when_call_fails():
-    responses.add(responses.GET, wacken_url, status=500)
+def test_get_wacken_artists_when_call_fails(httpx_mock):
+    httpx_mock.add_response(method="GET", url=wacken_url, status_code=500)
 
     artists = get_wacken_artists()
 
     assert artists == []
-    assert len(responses.calls) == 1
-    assert responses.calls[0].request.url == wacken_url
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == wacken_url
 
 
-@responses.activate
-def test_get_dong_artists():
+def test_get_dong_artists(httpx_mock):
     html_response = """
     <html>
         <body>
@@ -64,20 +59,19 @@ def test_get_dong_artists():
         </body>
     </html>
     """
-    responses.add(responses.GET, dong_url, body=html_response)
+    httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
     artists = get_dong_artists()
 
     assert artists == ["Bloodbath", "Dawn of Disease", "Hypocrisy", "Grave"]
-    assert len(responses.calls) == 1
-    assert responses.calls[0].request.url == dong_url
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == dong_url
 
 
-@responses.activate
-def test_get_dong_artists_when_call_fails():
-    responses.add(responses.GET, dong_url, status=500)
+def test_get_dong_artists_when_call_fails(httpx_mock):
+    httpx_mock.add_response(method="GET", url=dong_url, status_code=500)
 
     artists = get_dong_artists()
 
     assert artists == []
-    assert len(responses.calls) == 1
-    assert responses.calls[0].request.url == dong_url
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == dong_url

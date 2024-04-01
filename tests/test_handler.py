@@ -3,7 +3,6 @@ import os
 
 import boto3
 import pytest
-import responses
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -22,8 +21,9 @@ def setup_env():
 
 
 @mock_aws
-@responses.activate
-def test_get_bands_handler_gets_artists_and_images_and_uploads_them(setup_env):
+def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
+    setup_env, httpx_mock
+):
     wacken_bloodbath_response = [{"artist": {"title": "Bloodbath"}}]
     spotify_token_endpoint = "https://accounts.spotify.com/api/token"
     spotify_token_response = {
@@ -48,26 +48,29 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(setup_env):
             ]
         }
     }
-    responses.add(
-        responses.GET,
-        "https://www.wacken.com/fileadmin/Json/bandlist-concert.json",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://www.wacken.com/fileadmin/Json/bandlist-concert.json",
         json=wacken_bloodbath_response,
-        status=200,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        "https://www.dongopenair.de/de/bands/index",
-        status=200,
-        body="<div class='bandteaser'><a>Bloodbath</a>></div>",
+    httpx_mock.add_response(
+        method="GET",
+        url="https://www.dongopenair.de/de/bands/index",
+        status_code=200,
+        text="<div class='bandteaser'><a>Bloodbath</a>></div>",
     )
-    responses.add(
-        responses.POST, spotify_token_endpoint, json=spotify_token_response, status=200
+    httpx_mock.add_response(
+        method="POST",
+        url=spotify_token_endpoint,
+        json=spotify_token_response,
+        status_code=200,
     )
-    responses.add(
-        responses.GET,
-        spotify_search_bloodbath_url,
+    httpx_mock.add_response(
+        method="GET",
+        url=spotify_search_bloodbath_url,
         json=spotify_search_bloodbath_response,
-        status=200,
+        status_code=200,
     )
 
     s3_client: S3Client = boto3.client("s3")

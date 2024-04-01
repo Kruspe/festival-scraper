@@ -5,7 +5,7 @@ import os
 from base64 import b64encode
 from typing import List, Dict
 
-import requests
+import httpx
 
 from src.adapter.s3 import S3
 from src.adapter.ssm import Ssm
@@ -39,59 +39,67 @@ class Helper:
     def __init__(self, *, ssm: Ssm, s3: S3) -> None:
         self.ssm = ssm
         self.s3 = s3
+        self.artist_images = {}
 
-    def get_images(self, *, artist_names: List[str]) -> Dict:
+    async def get_images(self, *, artist_names: List[str]) -> Dict:
         if len(artist_names) == 0:
             return {}
 
         spotify_token = self._get_spotify_token()
-        artist_images = {}
 
-        for artist in artist_names:
-            search_response = requests.get(
-                "https://api.spotify.com/v1/search",
-                {"type": "artist", "limit": 5, "q": artist},
-                headers={"Authorization": "Bearer " + spotify_token},
-            )
-            search_response_status_code = search_response.status_code
-            search_response_json = search_response.json()
-
-            if search_response_status_code != 200:
-                logging.error(
-                    "Spotify search returned status "
-                    + str(search_response_status_code)
-                    + ", "
-                    + str(search_response_json)
+        async with httpx.AsyncClient() as client:
+            for artist in artist_names:
+                await self._retrieve_image(
+                    client=client, artist=artist, spotify_token=spotify_token
                 )
-                raise SpotifyException("Spotify search response is invalid")
 
-            found_artists = search_response_json["artists"]["items"]
-            if len(found_artists) == 0:
-                artist_images[artist] = None
-                continue
+        return self.artist_images
 
-            matching_artists = _find_artists_with_matching_name(found_artists, artist)
-            if len(matching_artists) == 0:
-                artist_images[artist] = None
-                continue
-            matching_artists_with_images = _find_artists_with_images(matching_artists)
-            if len(matching_artists_with_images) == 0:
-                artist_images[artist] = None
-                continue
+    async def _retrieve_image(
+        self, *, client: httpx.AsyncClient, artist: str, spotify_token: str
+    ):
+        search_response = await client.get(
+            "https://api.spotify.com/v1/search",
+            params={"type": "artist", "limit": 5, "q": artist},
+            headers={"Authorization": "Bearer " + spotify_token},
+        )
+        search_response_status_code = search_response.status_code
+        search_response_json = search_response.json()
 
-            artist_images_with_correct_size = _get_images_with_size_greater_300(
-                matching_artists_with_images[0]
+        if search_response_status_code != 200:
+            logging.error(
+                "Spotify search returned status "
+                + str(search_response_status_code)
+                + ", "
+                + str(search_response_json)
             )
-            amount_of_images = len(artist_images_with_correct_size)
-            if amount_of_images == 0:
-                artist_images[artist] = None
-                continue
+            raise SpotifyException("Spotify search response is invalid")
 
-            artist_images[artist] = artist_images_with_correct_size[
-                amount_of_images - 1
-            ]["url"]
+        found_artists = search_response_json["artists"]["items"]
+        if len(found_artists) == 0:
+            self.artist_images[artist] = None
+            return
 
-        return artist_images
+        matching_artists = _find_artists_with_matching_name(found_artists, artist)
+        if len(matching_artists) == 0:
+            self.artist_images[artist] = None
+            return
+        matching_artists_with_images = _find_artists_with_images(matching_artists)
+        if len(matching_artists_with_images) == 0:
+            self.artist_images[artist] = None
+            return
+
+        artist_images_with_correct_size = _get_images_with_size_greater_300(
+            matching_artists_with_images[0]
+        )
+        amount_of_images = len(artist_images_with_correct_size)
+        if amount_of_images == 0:
+            self.artist_images[artist] = None
+            return
+
+        self.artist_images[artist] = artist_images_with_correct_size[
+            amount_of_images - 1
+        ]["url"]
 
     def upload(self, *, artist_images: Dict[str, str], festival_name: str):
         if artist_images:
@@ -124,9 +132,9 @@ class Helper:
                 + spotify_secrets[spotify_client_secret_parameter_name]
             ).encode()
         ).decode("utf-8")
-        spotify_token_response = requests.post(
+        spotify_token_response = httpx.post(
             "https://accounts.spotify.com/api/token",
-            "grant_type=client_credentials",
+            json="grant_type=client_credentials",
             headers={
                 "Authorization": encoded_spotify_basic_auth,
                 "Content-Type": "application/x-www-form-urlencoded",
