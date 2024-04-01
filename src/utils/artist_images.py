@@ -39,25 +39,25 @@ class Helper:
     def __init__(self, *, ssm: Ssm, s3: S3) -> None:
         self.ssm = ssm
         self.s3 = s3
-        self.artist_images = {}
 
     async def get_images(self, *, artist_names: List[str]) -> Dict:
         if len(artist_names) == 0:
             return {}
 
         spotify_token = self._get_spotify_token()
+        artist_images = {}
 
         async with httpx.AsyncClient() as client:
             for artist in artist_names:
-                await self._retrieve_image(
+                artist_images[artist] = await self._retrieve_image(
                     client=client, artist=artist, spotify_token=spotify_token
                 )
 
-        return self.artist_images
+        return artist_images
 
     async def _retrieve_image(
         self, *, client: httpx.AsyncClient, artist: str, spotify_token: str
-    ):
+    ) -> str | None:
         search_response = await client.get(
             "https://api.spotify.com/v1/search",
             params={"type": "artist", "limit": 5, "q": artist},
@@ -77,29 +77,23 @@ class Helper:
 
         found_artists = search_response_json["artists"]["items"]
         if len(found_artists) == 0:
-            self.artist_images[artist] = None
-            return
+            return None
 
         matching_artists = _find_artists_with_matching_name(found_artists, artist)
         if len(matching_artists) == 0:
-            self.artist_images[artist] = None
-            return
+            return None
         matching_artists_with_images = _find_artists_with_images(matching_artists)
         if len(matching_artists_with_images) == 0:
-            self.artist_images[artist] = None
-            return
+            return None
 
         artist_images_with_correct_size = _get_images_with_size_greater_300(
             matching_artists_with_images[0]
         )
         amount_of_images = len(artist_images_with_correct_size)
         if amount_of_images == 0:
-            self.artist_images[artist] = None
-            return
+            return None
 
-        self.artist_images[artist] = artist_images_with_correct_size[
-            amount_of_images - 1
-        ]["url"]
+        return artist_images_with_correct_size[amount_of_images - 1]["url"]
 
     def upload(self, *, artist_images: Dict[str, str], festival_name: str):
         if artist_images:
