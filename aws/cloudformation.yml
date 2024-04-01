@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Festival scraper resources
 Parameters:
-  FestivalBucketArn:
+  ParamFestivalBucketArn:
     Type: AWS::SSM::Parameter::Value<String>
-  FestivalBucketName:
+  ParamFestivalBucketName:
     Type: AWS::SSM::Parameter::Value<String>
   ParamDeploymentBucketName:
     Type: AWS::SSM::Parameter::Value<String>
-  ParamWackenVersion:
+  ParamFunctionVersion:
     Type: String
 
 Resources:
@@ -32,7 +32,7 @@ Resources:
           Statement:
           - Effect: Allow
             Action: 's3:PutObject'
-            Resource: !Join [ "", [ !Ref FestivalBucketArn, "/wacken.json" ] ]
+            Resource: !Join [ "", [ !Ref ParamFestivalBucketArn, "/wacken.json" ] ]
       - PolicyName: GetSsmParameters
         PolicyDocument:
           Version: "2012-10-17"
@@ -52,20 +52,20 @@ Resources:
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: wackenArtists
+      FunctionName: festival-scraper
       Runtime: python3.12
       Handler: index.handler
       Role: !GetAtt [ LambdaExecutionRole, Arn ]
       Timeout: 60
       Environment:
         Variables:
-          FESTIVAL_ARTISTS_BUCKET: !Ref FestivalBucketName
+          FESTIVAL_ARTISTS_BUCKET: !Ref ParamFestivalBucketName
           SPOTIFY_CLIENT_ID_PARAMETER_NAME: /spotify/client-id
           SPOTIFY_CLIENT_SECRET_PARAMETER_NAME: /spotify/client-secret
       Code:
         S3Bucket: !Ref ParamDeploymentBucketName
-        S3Key: wacken.zip
-        S3ObjectVersion: !Ref ParamWackenVersion
+        S3Key: festival-scraper.zip
+        S3ObjectVersion: !Ref ParamFunctionVersion
 
   CronJobRole:
     Type: AWS::IAM::Role
@@ -90,8 +90,8 @@ Resources:
   LambdaCronJob:
     Type: AWS::Events::Rule
     Properties:
-      Name: WackenArtistsLamdaTrigger
-      ScheduleExpression: cron(0 9,20 * * ? *)
+      Name: FestivalScraperLambdaTrigger
+      ScheduleExpression: cron(0 9,15,20 * * ? *)
       RoleArn: !GetAtt [ CronJobRole, Arn ]
       Targets:
       - Arn: !GetAtt [ Lambda, Arn ]

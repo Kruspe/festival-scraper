@@ -17,12 +17,12 @@ tasks:
       - rm -rf dist
       - pip install --target ./dist -r requirements.lock
       - task: zip
-      - zip -r dist/wacken.zip src
-      - zip -r dist/wacken.zip handler.py
+      - zip -r dist/festival-scraper.zip src
+      - zip -r dist/festival-scraper.zip handler.py
   zip:
     dir: dist
     cmds:
-      - zip -r wacken.zip .
+      - zip -r festival-scraper.zip .
 
   ci:
     deps: [ install ]
@@ -43,5 +43,5 @@ tasks:
       --profile music-rating
     vars:
       WACKEN_VERSION_ID:
-        sh: aws s3api put-object --bucket music-rating-deployment-bucket --key wacken.zip --body ../dist/wacken.zip --profile music-rating | jq -r .VersionId
+        sh: aws s3api put-object --bucket music-rating-deployment-bucket --key festival-scraper.zip --body ../dist/festival-scraper.zip --profile music-rating | jq -r .VersionId
 
