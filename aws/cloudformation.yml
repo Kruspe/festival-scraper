@@ -54,7 +54,7 @@ Resources:
     Properties:
       FunctionName: festival-scraper
       Runtime: python3.12
-      Handler: index.handler
+      Handler: handler.handler
       Role: !GetAtt [ LambdaExecutionRole, Arn ]
       Timeout: 60
       Environment:
