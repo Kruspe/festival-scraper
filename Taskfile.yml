@@ -36,10 +36,10 @@ tasks:
     cmds:
     - aws cloudformation deploy --template-file cloudformation.yml --stack-name WackenArtists --capabilities CAPABILITY_NAMED_IAM
       --parameter-overrides
-      FestivalBucketArn=/festival-bucket/arn
-      FestivalBucketName=/festival-bucket/name
+      ParamFestivalBucketArn=/festival-bucket/arn
+      ParamFestivalBucketName=/festival-bucket/name
       ParamDeploymentBucketName=/music-rating/deployment-bucket/name
-      ParamWackenVersion={{.WACKEN_VERSION_ID}}
+      ParamFunctionVersion={{.WACKEN_VERSION_ID}}
       --profile music-rating
     vars:
       WACKEN_VERSION_ID:
