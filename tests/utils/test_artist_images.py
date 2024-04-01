@@ -138,7 +138,7 @@ async def test_get_images_endpoints_get_called_correctly(
     )
     content_type_header_key = "Content-Type"
     content_type_header_value = "application/x-www-form-urlencoded"
-    expected_body = b'"grant_type=client_credentials"'
+    expected_body = b"grant_type=client_credentials"
 
     httpx_mock.add_response(
         method="POST",

@@ -134,7 +134,7 @@ class Helper:
         ).decode("utf-8")
         spotify_token_response = httpx.post(
             "https://accounts.spotify.com/api/token",
-            json="grant_type=client_credentials",
+            data="grant_type=client_credentials",
             headers={
                 "Authorization": encoded_spotify_basic_auth,
                 "Content-Type": "application/x-www-form-urlencoded",
