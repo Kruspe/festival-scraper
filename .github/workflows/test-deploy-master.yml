@@ -43,7 +43,6 @@ jobs:
           source "$HOME/.rye/env"
           aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile music-rating
           aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile music-rating
-          task build
           task deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LAMBDA_DEPLOY_ACCESS_KEY_ID }}
