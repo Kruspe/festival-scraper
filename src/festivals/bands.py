@@ -28,3 +28,21 @@ def get_dong_artists():
             artist_names.append(element.find_next("a").text)
 
     return artist_names
+
+
+def get_rude_artists():
+    artist_names = []
+    response = httpx.get("https://www.rockunterdeneichen.de/bands")
+
+    if response.status_code == 200:
+        parsed_html = BeautifulSoup(response.text)
+        artist_html_list = parsed_html.find_all(
+            "div", attrs={"class": "cb-article-meta"}
+        )
+        print(artist_html_list)
+        for element in artist_html_list:
+            artist_names.append(
+                element.find_next("h2").find_next("a").text.split(" (")[0]
+            )
+
+    return artist_names

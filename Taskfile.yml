@@ -1,6 +1,10 @@
 version: '3'
 
 tasks:
+  default:
+    cmds:
+    - task: format
+    - task: test
   install:
     desc: Install all dependencies
     cmds: [ rye sync ]

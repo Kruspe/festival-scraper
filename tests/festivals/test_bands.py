@@ -1,7 +1,8 @@
-from src.festivals.bands import get_wacken_artists, get_dong_artists
+from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
 
 wacken_url = "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
 dong_url = "https://www.dongopenair.de/de/bands/index"
+rude_url = "https://www.rockunterdeneichen.de/bands"
 
 
 def test_get_wacken_artists(httpx_mock):
@@ -75,3 +76,43 @@ def test_get_dong_artists_when_call_fails(httpx_mock):
     assert artists == []
     assert len(httpx_mock.get_requests()) == 1
     assert httpx_mock.get_requests()[0].url == dong_url
+
+
+def test_get_rude_artists(httpx_mock):
+    html_response = """
+    <html>
+        <body>
+            <div class="cb-article-meta">
+                <h2>
+                    <a href="">Marduk (SWE)</a>
+                </h2>
+            </div>
+            <div class="cb-article-meta">
+                <h2>
+                    <a href="">Deserted Fear (D)</a>
+                </h2>
+            </div>
+            <div class="cb-article-meta">
+                <h2>
+                    <a href="">Legion of the Damned (NL)</a>
+                </h2>
+            </div>
+        </body>
+    </html>
+    """
+    httpx_mock.add_response(method="GET", url=rude_url, text=html_response)
+    artists = get_rude_artists()
+
+    assert artists == ["Marduk", "Deserted Fear", "Legion of the Damned"]
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == rude_url
+
+
+def test_get_rude_artists_when_call_fails(httpx_mock):
+    httpx_mock.add_response(method="GET", url=rude_url, status_code=500)
+
+    artists = get_rude_artists()
+
+    assert artists == []
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == rude_url
