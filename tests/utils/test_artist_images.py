@@ -199,7 +199,7 @@ async def test_get_images_returns_correct_images_for_two_bands(
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=BLOODBATH",
         json=bloodbath_search_response,
         status_code=200,
     )
@@ -210,7 +210,7 @@ async def test_get_images_returns_correct_images_for_two_bands(
         status_code=200,
     )
 
-    images = await artist_images.get_images(artist_names=["Bloodbath", "Megadeth"])
+    images = await artist_images.get_images(artist_names=["BLOODBATH", "Megadeth"])
 
     assert len(httpx_mock.get_requests()) == 3
 
