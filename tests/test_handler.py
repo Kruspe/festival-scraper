@@ -61,6 +61,12 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         text="<div class='bandteaser'><a>Bloodbath</a>></div>",
     )
     httpx_mock.add_response(
+        method="GET",
+        url="https://www.rockunterdeneichen.de/bands",
+        status_code=200,
+        text="<div class='cb-article-meta'><h2><a>Bloodbath (SWE)</a></h2></div>",
+    )
+    httpx_mock.add_response(
         method="POST",
         url=spotify_token_endpoint,
         json=spotify_token_response,
@@ -89,11 +95,14 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
 
     wacken_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]
     dong_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]
+    rude_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]
 
     handler(None, None)
 
     wacken_file = s3_client.get_object(Bucket="bucket-name", Key="wacken.json")
     dong_file = s3_client.get_object(Bucket="bucket-name", Key="dong.json")
+    rude_file = s3_client.get_object(Bucket="bucket-name", Key="rude.json")
 
     assert wacken_expected_result == json.load(wacken_file.get("Body"))
     assert dong_expected_result == json.load(dong_file.get("Body"))
+    assert rude_expected_result == json.load(rude_file.get("Body"))
