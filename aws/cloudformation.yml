@@ -33,8 +33,7 @@ Resources:
           - Effect: Allow
             Action: 's3:PutObject'
             Resource:
-            - !Join [ "", [ !Ref ParamFestivalBucketArn, "/wacken.json" ] ]
-            - !Join [ "", [ !Ref ParamFestivalBucketArn, "/dong.json" ] ]
+            - !Sub ${ParamFestivalBucketArn}/*
       - PolicyName: GetSsmParameters
         PolicyDocument:
           Version: "2012-10-17"
