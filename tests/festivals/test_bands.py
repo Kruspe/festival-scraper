@@ -2,7 +2,7 @@ from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_a
 
 wacken_url = "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
 dong_url = "https://www.dongopenair.de/de/bands/index"
-rude_url = "https://www.rockunterdeneichen.de/bands"
+rude_url = "https://www.rockunterdeneichen.de/bands/"
 
 
 def test_get_wacken_artists(httpx_mock):

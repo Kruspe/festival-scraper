@@ -62,7 +62,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://www.rockunterdeneichen.de/bands",
+        url="https://www.rockunterdeneichen.de/bands/",
         status_code=200,
         text="<div class='cb-article-meta'><h2><a>Bloodbath (SWE)</a></h2></div>",
     )
