@@ -22,10 +22,13 @@ def get_dong_artists():
     response = httpx.get("https://www.dongopenair.de/de/bands/index")
 
     if response.status_code == 200:
-        parsed_html = BeautifulSoup(response.text)
+        parsed_html = BeautifulSoup(response.text, features="html.parser")
         artist_html_list = parsed_html.find_all("div", attrs={"class": "bandteaser"})
         for element in artist_html_list:
-            artist_names.append(element.find_next("a").text)
+            band_link = element.a
+            if band_link is None:
+                continue
+            artist_names.append(band_link.text)
 
     return artist_names
 
@@ -35,11 +38,10 @@ def get_rude_artists():
     response = httpx.get("https://www.rockunterdeneichen.de/bands/")
 
     if response.status_code == 200:
-        parsed_html = BeautifulSoup(response.text)
+        parsed_html = BeautifulSoup(response.text, features="html.parser")
         artist_html_list = parsed_html.find_all(
             "div", attrs={"class": "cb-article-meta"}
         )
-        print(artist_html_list)
         for element in artist_html_list:
             artist_names.append(
                 element.find_next("h2").find_next("a").text.split(" (")[0]

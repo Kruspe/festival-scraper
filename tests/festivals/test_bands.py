@@ -67,6 +67,30 @@ def test_get_dong_artists(httpx_mock):
     assert len(httpx_mock.get_requests()) == 1
     assert httpx_mock.get_requests()[0].url == dong_url
 
+def test_get_dong_artists_does_not_return_when_no_a_element_appears(httpx_mock):
+    html_response = """
+        <html>
+            <body>
+                <h1>Some Headline</h1>
+                <div>Any Text Here</div>
+                <div class="headline">alle bisherigen Bands für das D.O.A 2024>
+                    <div class="bandteaser">
+                        <p> <span class="headline"><a href="">Bloodbath</a></span></p>
+                    </div>
+                    <div class="bandteaser">
+                        <p><span style="margin-left: 115px; font-weight:bold; color: #fb4a00 !important;">Party mit DJ Benne</span></p>
+                    </div>
+                </div> 
+            </body>
+        </html>
+        """
+    httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
+    artists = get_dong_artists()
+
+    assert artists == ["Bloodbath"]
+    assert len(httpx_mock.get_requests()) == 1
+    assert httpx_mock.get_requests()[0].url == dong_url
+
 
 def test_get_dong_artists_when_call_fails(httpx_mock):
     httpx_mock.add_response(method="GET", url=dong_url, status_code=500)
