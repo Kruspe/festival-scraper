@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 import os
 from base64 import b64encode
 from typing import Union
@@ -71,6 +72,7 @@ async def test_get_images_with_empty_list_empty_dict(artist_images, httpx_mock):
 async def test_get_images_raises_and_logs_exception_when_getting_token_fails(
     caplog, artist_images, spotify_envs, httpx_mock
 ):
+    caplog.set_level(logging.ERROR)
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="POST", url=spotify_token_endpoint, json=error_message, status_code=500
@@ -95,6 +97,7 @@ async def test_get_images_raises_and_logs_exception_when_getting_token_fails(
 async def test_get_images_raises_and_logs_exception_when_search_fails(
     caplog, artist_images, spotify_envs, httpx_mock
 ):
+    caplog.set_level(logging.ERROR)
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="POST",
