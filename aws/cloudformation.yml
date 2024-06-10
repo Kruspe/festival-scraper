@@ -63,6 +63,7 @@ Resources:
           FESTIVAL_ARTISTS_BUCKET: !Ref ParamFestivalBucketName
           SPOTIFY_CLIENT_ID_PARAMETER_NAME: /spotify/client-id
           SPOTIFY_CLIENT_SECRET_PARAMETER_NAME: /spotify/client-secret
+          LOG_LEVEL: ERROR
       Code:
         S3Bucket: !Ref ParamDeploymentBucketName
         S3Key: festival-scraper.zip

@@ -2,6 +2,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
+logger = logging.getLogger(__name__)
 
 class S3:
     def __init__(self, s3_client) -> None:
@@ -12,5 +13,5 @@ class S3:
         try:
             self.s3.put_object(Bucket=bucket_name, Key=key, Body=json)
         except ClientError as e:
-            logging.error(e)
+            logger.error(e)
             raise

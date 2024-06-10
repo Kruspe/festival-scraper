@@ -1,4 +1,6 @@
 import asyncio
+import logging
+import os
 
 import boto3
 
@@ -8,7 +10,13 @@ from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_a
 from src.utils.artist_images import Helper
 
 
+def _configure_logger():
+    log_level = os.environ.get("LOG_LEVEL", "INFO")
+    logging.basicConfig(level=log_level)
+
+
 def handler(event, context):
+    _configure_logger()
     s3_client = boto3.client("s3")
     ssm_client = boto3.client("ssm", "eu-west-1")
 

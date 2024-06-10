@@ -18,6 +18,9 @@ class ArtistInformation:
     image_url: str | None
 
 
+logger = logging.getLogger(__name__)
+
+
 def _find_artists_with_matching_name(search_result, name):
     return list(
         itertools.filterfalse(
@@ -80,7 +83,7 @@ class Helper:
         search_response_json = search_response.json()
 
         if search_response_status_code != 200:
-            logging.error(
+            logger.error(
                 "Spotify search returned status "
                 + str(search_response_status_code)
                 + ", "
@@ -91,10 +94,12 @@ class Helper:
         found_artists = search_response_json["artists"]["items"]
         if len(found_artists) == 0:
             return None
+        logger.debug(f"Found the following{found_artists}")
 
         matching_artists = _find_artists_with_matching_name(found_artists, artist)
         if len(matching_artists) == 0:
             return None
+        logger.debug(f"Matching artists: {matching_artists}")
         spotify_artist_name = matching_artists[0]["name"]
         matching_artists_with_images = _find_artists_with_images(matching_artists)
         if len(matching_artists_with_images) == 0:
@@ -155,7 +160,7 @@ class Helper:
         token_response_json = spotify_token_response.json()
 
         if token_response_status_code != 200:
-            logging.error(
+            logger.error(
                 "Spotify token endpoint returned status "
                 + str(token_response_status_code)
                 + ", "
