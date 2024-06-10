@@ -11,8 +11,8 @@ from src.utils.artist_images import Helper
 
 
 def _configure_logger():
-    log_level = os.environ.get("LOG_LEVEL", "INFO")
-    logging.basicConfig(level=log_level)
+    log_level_name = os.environ.get("LOG_LEVEL", "INFO")
+    logging.basicConfig(level=logging.getLevelName(log_level_name))
 
 
 def handler(event, context):
