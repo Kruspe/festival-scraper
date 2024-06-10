@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
 
+
 class S3:
     def __init__(self, s3_client) -> None:
         super().__init__()

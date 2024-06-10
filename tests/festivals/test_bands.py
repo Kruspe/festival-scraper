@@ -67,6 +67,7 @@ def test_get_dong_artists(httpx_mock):
     assert len(httpx_mock.get_requests()) == 1
     assert httpx_mock.get_requests()[0].url == dong_url
 
+
 def test_get_dong_artists_does_not_return_when_no_a_element_appears(httpx_mock):
     html_response = """
         <html>
