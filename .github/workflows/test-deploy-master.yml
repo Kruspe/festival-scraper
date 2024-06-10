@@ -20,7 +20,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Test
         run: |
-          curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+          curl -sSf https://rye.astral.sh/get | bash
           source "$HOME/.rye/env"
           task ci
   deploy:
@@ -39,7 +39,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy Lambda
         run: |
-          curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+          curl -sSf https://rye.astral.sh/get | bash
           source "$HOME/.rye/env"
           aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile music-rating
           aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile music-rating
