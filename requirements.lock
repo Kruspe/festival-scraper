@@ -9,7 +9,10 @@
 #   generate-hashes: false
 
 -e file:.
+aiometer==0.5.0
+    # via festival-scraper
 anyio==4.3.0
+    # via aiometer
     # via httpx
 beautifulsoup4==4.12.3
     # via festival-scraper

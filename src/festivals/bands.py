@@ -1,7 +1,8 @@
-import asyncio
+import functools
 import logging
 from typing import Mapping
 
+import aiometer
 import httpx
 from bs4 import BeautifulSoup
 
@@ -9,6 +10,7 @@ from src.adapter.spotify import ArtistInformation, SpotifyClient
 
 
 logger = logging.getLogger(__name__)
+
 
 async def get_wacken_artists(
     *, spotify_client: SpotifyClient
@@ -77,21 +79,20 @@ async def get_rude_artists(
 async def _retrieve_images(
     *, spotify_client: SpotifyClient, artist_names: list[str]
 ) -> Mapping[str, ArtistInformation]:
-    tasks = set()
-    async with asyncio.TaskGroup() as tg:
-        for artist_name in artist_names:
-            tasks.add(
-                tg.create_task(
-                    spotify_client.search_artist(
-                        name=artist_name, genres=["Metal", "Rock", "Core", "Heavy"]
-                    )
-                )
+    artist_information = await aiometer.run_all(
+        [
+            functools.partial(
+                spotify_client.search_artist,
+                name=artist_name,
+                genres=["Metal", "Rock", "Core", "Heavy"],
             )
+            for artist_name in artist_names
+        ],
+        max_at_once=100,
+        max_per_second=10,
+    )
 
     result = {}
-    for task in tasks:
-        task_result = task.result()
-        if type(task_result) is not ArtistInformation:
-            logger.error(f"Artist {task_result} was not found.")
-        result[task_result.name] = task_result
+    for a in artist_information:
+        result[a.name] = a
     return result
