@@ -189,7 +189,7 @@ async def test_search_artist_returns_artist_information(spotify_client, httpx_mo
 
 
 @pytest.mark.asyncio
-async def test_search_artist_returns_None_when_name_does_not_match_exactly(
+async def test_search_artist_returns_no_image_url_when_name_does_not_match_exactly(
     spotify_client, httpx_mock
 ):
     httpx_mock.add_response(
@@ -218,11 +218,11 @@ async def test_search_artist_returns_None_when_name_does_not_match_exactly(
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information is None
+    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
 
 
 @pytest.mark.asyncio
-async def test_search_artist_returns_None_when_no_artists_are_found(
+async def test_search_artist_returns_no_image_url_when_no_artists_are_found(
     spotify_client, httpx_mock
 ):
     httpx_mock.add_response(
@@ -239,11 +239,11 @@ async def test_search_artist_returns_None_when_no_artists_are_found(
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information is None
+    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
 
 
 @pytest.mark.asyncio
-async def test_search_artist_returns_None_when_genre_does_not_match(
+async def test_search_artist_returns_no_image_url_when_genre_does_not_match(
     spotify_client, httpx_mock
 ):
     httpx_mock.add_response(
@@ -272,7 +272,7 @@ async def test_search_artist_returns_None_when_genre_does_not_match(
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information is None
+    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
 
 
 @pytest.mark.asyncio

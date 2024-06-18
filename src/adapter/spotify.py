@@ -31,7 +31,7 @@ class SpotifyClient:
         self.client_id = spotify_secrets[client_id_parameter_name]
         self.client_secret = spotify_secrets[client_secret_parameter_name]
         self.token = self._get_token()
-        self.client = httpx.AsyncClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=20))
+        self.client = httpx.AsyncClient()
 
     def _get_token(self) -> str:
         encoded_credentials = b64encode(
@@ -60,9 +60,7 @@ class SpotifyClient:
 
         return token_response_json["access_token"]
 
-    async def search_artist(
-        self, *, name: str, genres: list[str]
-    ) -> ArtistInformation | None:
+    async def search_artist(self, *, name: str, genres: list[str]) -> ArtistInformation:
         search_response = await self.client.get(
             "https://api.spotify.com/v1/search",
             params={"type": "artist", "limit": 5, "q": name},
@@ -81,7 +79,7 @@ class SpotifyClient:
 
         found_artists = search_response_json["artists"]["items"]
         if len(found_artists) == 0:
-            return None
+            return ArtistInformation(name=name, image_url=None)
 
         best_matches = []
         for artist in found_artists:
@@ -97,7 +95,7 @@ class SpotifyClient:
                 best_matches.append(artist)
 
         if len(best_matches) == 0:
-            return None
+            return ArtistInformation(name=name, image_url=None)
 
         logger.info(f"Found {len(best_matches)} artists for {name}")
         matching_information: list[ArtistInformation] = []

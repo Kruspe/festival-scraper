@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Mapping
 
 import httpx
@@ -6,6 +7,8 @@ from bs4 import BeautifulSoup
 
 from src.adapter.spotify import ArtistInformation, SpotifyClient
 
+
+logger = logging.getLogger(__name__)
 
 async def get_wacken_artists(
     *, spotify_client: SpotifyClient
@@ -88,5 +91,7 @@ async def _retrieve_images(
     result = {}
     for task in tasks:
         task_result = task.result()
+        if type(task_result) is not ArtistInformation:
+            logger.error(f"Artist {task_result} was not found.")
         result[task_result.name] = task_result
     return result
