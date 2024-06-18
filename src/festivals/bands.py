@@ -89,10 +89,10 @@ async def _retrieve_images(
             for artist_name in artist_names
         ],
         max_at_once=100,
-        max_per_second=10,
+        max_per_second=5,
     )
 
     result = {}
-    for a in artist_information:
-        result[a.name] = a
+    for artist_info in artist_information:
+        result[artist_info.name] = artist_info
     return result
