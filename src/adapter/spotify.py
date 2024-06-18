@@ -83,7 +83,7 @@ class SpotifyClient:
 
         best_matches = []
         for artist in found_artists:
-            if artist["name"] and artist["name"] != name:
+            if artist["name"].lower() != name.lower():
                 continue
             if len(artist["genres"]) > 0:
                 for genre in genres:
@@ -97,21 +97,21 @@ class SpotifyClient:
         if len(best_matches) == 0:
             return ArtistInformation(name=name, image_url=None)
 
-        logger.info(f"Found {len(best_matches)} artists for {name}")
         matching_information: list[ArtistInformation] = []
         for match in best_matches:
             if len(match["images"]) > 0:
                 for image in reversed(match["images"]):
                     if image["width"] >= 300 or image["height"] >= 300:
                         matching_information.append(
-                            ArtistInformation(name=name, image_url=image["url"])
+                            ArtistInformation(
+                                name=match["name"], image_url=image["url"]
+                            )
                         )
                         break
 
         if len(matching_information) == 0:
             return ArtistInformation(name=name, image_url=None)
 
-        logger.info(f"Using {matching_information[0]} for {name}")
         return ArtistInformation(
             name=matching_information[0].name,
             image_url=matching_information[0].image_url,

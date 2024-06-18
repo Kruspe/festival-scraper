@@ -1,5 +1,4 @@
 import functools
-import logging
 from typing import Mapping
 
 import aiometer
@@ -7,9 +6,6 @@ import httpx
 from bs4 import BeautifulSoup
 
 from src.adapter.spotify import ArtistInformation, SpotifyClient
-
-
-logger = logging.getLogger(__name__)
 
 
 async def get_wacken_artists(
