@@ -31,6 +31,7 @@ class SpotifyClient:
         self.client_id = spotify_secrets[client_id_parameter_name]
         self.client_secret = spotify_secrets[client_secret_parameter_name]
         self.token = self._get_token()
+        self.client = httpx.AsyncClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=20))
 
     def _get_token(self) -> str:
         encoded_credentials = b64encode(
@@ -62,57 +63,61 @@ class SpotifyClient:
     async def search_artist(
         self, *, name: str, genres: list[str]
     ) -> ArtistInformation | None:
-        async with httpx.AsyncClient() as client:
-            search_response = await client.get(
-                "https://api.spotify.com/v1/search",
-                params={"type": "artist", "limit": 5, "q": name},
-                headers={"Authorization": "Bearer " + self.token},
+        search_response = await self.client.get(
+            "https://api.spotify.com/v1/search",
+            params={"type": "artist", "limit": 5, "q": name},
+            headers={"Authorization": "Bearer " + self.token},
+        )
+        search_response_status_code = search_response.status_code
+        search_response_json = search_response.json()
+        if search_response_status_code != 200:
+            logger.error(
+                "Spotify search returned status "
+                + str(search_response_status_code)
+                + ", "
+                + str(search_response_json)
             )
-            search_response_status_code = search_response.status_code
-            search_response_json = search_response.json()
-            if search_response_status_code != 200:
-                logger.error(
-                    "Spotify search returned status "
-                    + str(search_response_status_code)
-                    + ", "
-                    + str(search_response_json)
-                )
-                raise SpotifyException("Spotify search response is invalid")
+            raise SpotifyException("Spotify search response is invalid")
 
-            found_artists = search_response_json["artists"]["items"]
-            if len(found_artists) == 0:
-                return None
+        found_artists = search_response_json["artists"]["items"]
+        if len(found_artists) == 0:
+            return None
 
-            best_matches = []
-            for artist in found_artists:
-                if artist["name"] != name:
-                    continue
+        best_matches = []
+        for artist in found_artists:
+            if artist["name"] and artist["name"] != name:
+                continue
+            if len(artist["genres"]) > 0:
                 for genre in genres:
                     for artist_genre in artist["genres"]:
                         if genre.lower() in artist_genre.lower():
                             best_matches.append(artist)
                             break
+            else:
+                best_matches.append(artist)
 
-            if len(best_matches) == 0:
-                return None
+        if len(best_matches) == 0:
+            return None
 
-            matching_information: list[ArtistInformation] = []
-            for match in best_matches:
-                if len(match["images"]) > 0:
-                    for image in reversed(match["images"]):
-                        if image["width"] >= 300 or image["height"] >= 300:
-                            matching_information.append(
-                                ArtistInformation(name=name, image_url=image["url"])
-                            )
-                            break
+        logger.info(f"Found {len(best_matches)} artists for {name}")
+        matching_information: list[ArtistInformation] = []
+        for match in best_matches:
+            if len(match["images"]) > 0:
+                for image in reversed(match["images"]):
+                    if image["width"] >= 300 or image["height"] >= 300:
+                        matching_information.append(
+                            ArtistInformation(name=name, image_url=image["url"])
+                        )
+                        break
 
-            if len(matching_information) == 0:
-                return ArtistInformation(name=name, image_url=None)
+        if len(matching_information) == 0:
+            return ArtistInformation(name=name, image_url=None)
 
-            return ArtistInformation(
-                name=matching_information[0].name,
-                image_url=matching_information[0].image_url,
-            )
+        logger.info(f"Using {matching_information[0]} for {name}")
+        return ArtistInformation(
+            name=matching_information[0].name,
+            image_url=matching_information[0].image_url,
+        )
 
 
 class SpotifyException(Exception):

@@ -11,8 +11,6 @@ from src.adapter.ssm import Ssm
 from src.adapter.spotify import SpotifyClient, ArtistInformation
 from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
 
-logger = logging.getLogger(__name__)
-
 
 def _configure_logger():
     log_level_name = os.environ.get("LOG_LEVEL", "INFO")
@@ -20,15 +18,12 @@ def _configure_logger():
 
 
 async def _handle(*, s3: S3, spotify_client: SpotifyClient):
-    logger.info("getting all festivals")
     async with asyncio.TaskGroup() as tg:
         wacken_task = tg.create_task(get_wacken_artists(spotify_client=spotify_client))
         dong_task = tg.create_task(get_dong_artists(spotify_client=spotify_client))
         rude_task = tg.create_task(get_rude_artists(spotify_client=spotify_client))
-    logger.info("finished getting all festivals")
 
     wacken_artists: Mapping[str, ArtistInformation] = wacken_task.result()
-    logger.info("retrieved artists for wacken:", wacken_artists)
     wacken_body = []
     for artist in wacken_artists.values():
         wacken_body.append({"artist": artist.name, "image": artist.image_url})
