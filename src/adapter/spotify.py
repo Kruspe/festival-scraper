@@ -1,0 +1,119 @@
+import logging
+import os
+from base64 import b64encode
+from dataclasses import dataclass
+
+import httpx
+
+from src.adapter.ssm import Ssm
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ArtistInformation:
+    name: str
+    image_url: str | None
+
+
+class SpotifyClient:
+    def __init__(self, *, ssm: Ssm):
+        client_id_parameter_name = os.environ.get("SPOTIFY_CLIENT_ID_PARAMETER_NAME")
+        client_secret_parameter_name = os.environ.get(
+            "SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"
+        )
+        spotify_secrets = ssm.get_parameters(
+            parameter_names=[
+                client_id_parameter_name,
+                client_secret_parameter_name,
+            ]
+        )
+        self.client_id = spotify_secrets[client_id_parameter_name]
+        self.client_secret = spotify_secrets[client_secret_parameter_name]
+        self.token = self._get_token()
+
+    def _get_token(self) -> str:
+        encoded_credentials = b64encode(
+            f"{self.client_id}:{self.client_secret}".encode()
+        )
+        encoded_spotify_basic_auth = f"Basic {encoded_credentials.decode("utf-8")}"
+        spotify_token_response = httpx.post(
+            "https://accounts.spotify.com/api/token",
+            data="grant_type=client_credentials",
+            headers={
+                "Authorization": encoded_spotify_basic_auth,
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        )
+        token_response_status_code = spotify_token_response.status_code
+        token_response_json = spotify_token_response.json()
+
+        if token_response_status_code != 200:
+            logger.error(
+                "Spotify token endpoint returned status "
+                + str(token_response_status_code)
+                + ", "
+                + str(token_response_json)
+            )
+            raise SpotifyException("Spotify token response is invalid")
+
+        return token_response_json["access_token"]
+
+    async def search_artist(
+        self, *, name: str, genres: list[str]
+    ) -> ArtistInformation | None:
+        async with httpx.AsyncClient() as client:
+            search_response = await client.get(
+                "https://api.spotify.com/v1/search",
+                params={"type": "artist", "limit": 5, "q": name},
+                headers={"Authorization": "Bearer " + self.token},
+            )
+            search_response_status_code = search_response.status_code
+            search_response_json = search_response.json()
+            if search_response_status_code != 200:
+                logger.error(
+                    "Spotify search returned status "
+                    + str(search_response_status_code)
+                    + ", "
+                    + str(search_response_json)
+                )
+                raise SpotifyException("Spotify search response is invalid")
+
+            found_artists = search_response_json["artists"]["items"]
+            if len(found_artists) == 0:
+                return None
+
+            best_matches = []
+            for artist in found_artists:
+                if artist["name"] != name:
+                    continue
+                for genre in genres:
+                    for artist_genre in artist["genres"]:
+                        if genre.lower() in artist_genre.lower():
+                            best_matches.append(artist)
+                            break
+
+            if len(best_matches) == 0:
+                return None
+
+            matching_information: list[ArtistInformation] = []
+            for match in best_matches:
+                if len(match["images"]) > 0:
+                    for image in reversed(match["images"]):
+                        if image["width"] >= 300 or image["height"] >= 300:
+                            matching_information.append(
+                                ArtistInformation(name=name, image_url=image["url"])
+                            )
+                            break
+
+            if len(matching_information) == 0:
+                return ArtistInformation(name=name, image_url=None)
+
+            return ArtistInformation(
+                name=matching_information[0].name,
+                image_url=matching_information[0].image_url,
+            )
+
+
+class SpotifyException(Exception):
+    pass

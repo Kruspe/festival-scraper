@@ -1,8 +1,15 @@
+import asyncio
+from typing import Mapping
+
 import httpx
 from bs4 import BeautifulSoup
 
+from src.adapter.spotify import ArtistInformation, SpotifyClient
 
-def get_wacken_artists():
+
+async def get_wacken_artists(
+    *, spotify_client: SpotifyClient
+) -> Mapping[str, ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.wacken.com/fileadmin/Json/bandlist-concert.json")
 
@@ -14,10 +21,16 @@ def get_wacken_artists():
                 and artist["artist"]["title"] != "Metal Yoga"
             ):
                 artist_names.append(artist["artist"]["title"])
-    return artist_names
+
+    artist_information = await _retrieve_images(
+        spotify_client=spotify_client, artist_names=artist_names
+    )
+    return artist_information
 
 
-def get_dong_artists():
+async def get_dong_artists(
+    *, spotify_client: SpotifyClient
+) -> Mapping[str, ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.dongopenair.de/de/bands/index")
 
@@ -30,10 +43,15 @@ def get_dong_artists():
                 continue
             artist_names.append(band_link.text)
 
-    return artist_names
+    artist_information = await _retrieve_images(
+        spotify_client=spotify_client, artist_names=artist_names
+    )
+    return artist_information
 
 
-def get_rude_artists():
+async def get_rude_artists(
+    *, spotify_client: SpotifyClient
+) -> Mapping[str, ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.rockunterdeneichen.de/bands/")
 
@@ -47,4 +65,28 @@ def get_rude_artists():
                 element.find_next("h2").find_next("a").text.split(" (")[0]
             )
 
-    return artist_names
+    artist_information = await _retrieve_images(
+        spotify_client=spotify_client, artist_names=artist_names
+    )
+    return artist_information
+
+
+async def _retrieve_images(
+    *, spotify_client: SpotifyClient, artist_names: list[str]
+) -> Mapping[str, ArtistInformation]:
+    tasks = set()
+    async with asyncio.TaskGroup() as tg:
+        for artist_name in artist_names:
+            tasks.add(
+                tg.create_task(
+                    spotify_client.search_artist(
+                        name=artist_name, genres=["Metal", "Rock", "Core", "Heavy"]
+                    )
+                )
+            )
+
+    result = {}
+    for task in tasks:
+        task_result = task.result()
+        result[task_result.name] = task_result
+    return result

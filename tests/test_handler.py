@@ -11,18 +11,14 @@ from handler import handler
 
 @pytest.fixture
 def setup_env():
-    os.environ["SPOTIFY_CLIENT_ID_PARAMETER_NAME"] = "/spotify/client-id"
-    os.environ["SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"] = "/spotify/client-secret"
     os.environ["FESTIVAL_ARTISTS_BUCKET"] = "bucket-name"
     yield
-    del os.environ["SPOTIFY_CLIENT_ID_PARAMETER_NAME"]
-    del os.environ["SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"]
     del os.environ["FESTIVAL_ARTISTS_BUCKET"]
 
 
 @mock_aws
 def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
-    setup_env, httpx_mock
+    spotify_envs, setup_env, httpx_mock
 ):
     wacken_bloodbath_response = [{"artist": {"title": "Bloodbath"}}]
     spotify_token_endpoint = "https://accounts.spotify.com/api/token"
@@ -38,6 +34,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         "artists": {
             "items": [
                 {
+                    "genres": ["Swedish Death Metal"],
                     "images": [
                         {"height": 640, "url": "https://image_640.com", "width": 640},
                         {"height": 320, "url": "https://image_320.com", "width": 320},
