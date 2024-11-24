@@ -94,7 +94,7 @@ def test_create_pr_calls_correct_endpoint(github_client, httpx_mock):
         match_content=json.dumps(
             {
                 "title": f"Search for ArtistInformation manually: {artist_name}",
-                "head": f"artistInfo/{artist_name}",
+                "head": f"kruspe:artistInfo_{artist_name}",
                 "base": "main",
                 "body": f"Could not find ArtistInformation for {artist_name}. Please look them up manually.",
             }
