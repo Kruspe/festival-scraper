@@ -56,7 +56,7 @@ def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx
     )
 
     client = GitHubClient(ssm=ssm_mock)
-    assert client.created_prs == ["Bloodbath"]
+    assert client.created_prs == ["bloodbath"]
 
 
 def test_github_client_initializes_raises_and_logs_exception_during_initialization(
@@ -85,7 +85,7 @@ def test_github_client_initializes_raises_and_logs_exception_during_initializati
         )
 
 
-def test_search_artist_calls_correct_endpoint(github_client, httpx_mock):
+def test_create_pr_calls_correct_endpoint(github_client, httpx_mock):
     artist_name = "Bloodbath"
     httpx_mock.add_response(
         method="POST",
@@ -108,7 +108,14 @@ def test_search_artist_calls_correct_endpoint(github_client, httpx_mock):
     github_client.create_pr(artist_name=artist_name)
 
 
-def test_search_artist_raises_and_logs_exception_when_search_fails(
+def test_create_pr_does_not_create_pr_when_it_already_exists(github_client, httpx_mock):
+    github_client.created_prs = ["hypocrisy"]
+    github_client.create_pr(artist_name="Hypocrisy")
+
+    assert len(httpx_mock.get_requests()) == 1
+
+
+def test_create_pr_raises_and_logs_exception_when_search_fails(
     caplog, github_client, httpx_mock
 ):
     error_message = {"error": "error"}

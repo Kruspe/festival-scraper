@@ -19,6 +19,9 @@ class GitHubClient:
         self.created_prs = self._retrieve_bands_with_pr()
 
     def create_pr(self, *, artist_name: str) -> None:
+        if artist_name.lower() in self.created_prs:
+            logger.info(f"PR for {artist_name} already exists")
+            return
         response = httpx.post(
             "https://api.github.com/repos/kruspe/festival-scraper/pulls",
             headers={
@@ -64,7 +67,7 @@ class GitHubClient:
         result = []
         for pr in response.json():
             if "Search for ArtistInformation manually" in pr["title"]:
-                result.append(pr["title"].split(": ")[1])
+                result.append(pr["title"].split(": ")[1].lower())
         return result
 
 

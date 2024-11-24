@@ -30,6 +30,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     spotify_search_bloodbath_url = (
         "https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath"
     )
+    github_pr_url = "https://api.github.com/repos/kruspe/festival-scraper/pulls"
     spotify_search_bloodbath_response = {
         "artists": {
             "items": [
@@ -76,6 +77,12 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         json=spotify_search_bloodbath_response,
         status_code=200,
         is_reusable=True,
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url=github_pr_url,
+        json=[],
+        status_code=200,
     )
 
     s3_client: S3Client = boto3.client("s3")
