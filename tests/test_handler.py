@@ -30,7 +30,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     spotify_search_bloodbath_url = (
         "https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath"
     )
-    github_pr_url = "https://api.github.com/repos/kruspe/festival-scraper/pulls"
+    github_issue_url = "https://api.github.com/repos/kruspe/festival-scraper/issues"
     spotify_search_bloodbath_response = {
         "artists": {
             "items": [
@@ -80,7 +80,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     )
     httpx_mock.add_response(
         method="GET",
-        url=github_pr_url,
+        url=github_issue_url,
         json=[],
         status_code=200,
     )

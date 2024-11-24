@@ -28,7 +28,7 @@ def ssm_mock():
 def github_client(github_envs, ssm_mock, httpx_mock):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
         json=[],
         match_headers={
@@ -43,7 +43,7 @@ def github_client(github_envs, ssm_mock, httpx_mock):
 def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx_mock):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
         json=[
             {"title": "Search for ArtistInformation manually: Bloodbath"},
@@ -65,7 +65,7 @@ def test_github_client_initializes_raises_and_logs_exception_during_initializati
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="GET",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         json=error_message,
         status_code=500,
     )
@@ -85,18 +85,17 @@ def test_github_client_initializes_raises_and_logs_exception_during_initializati
         )
 
 
-def test_create_pr_calls_correct_endpoint(github_client, httpx_mock):
+def test_create_issue_calls_correct_endpoint(github_client, httpx_mock):
     artist_name = "Bloodbath"
     httpx_mock.add_response(
         method="POST",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=201,
         match_content=json.dumps(
             {
                 "title": f"Search for ArtistInformation manually: {artist_name}",
-                "head": f"kruspe:artistInfo_{artist_name}",
-                "base": "main",
                 "body": f"Could not find ArtistInformation for {artist_name}. Please look them up manually.",
+                "assignee": "kruspe",
             }
         ).encode("utf-8"),
         match_headers={
@@ -105,29 +104,31 @@ def test_create_pr_calls_correct_endpoint(github_client, httpx_mock):
         },
     )
 
-    github_client.create_pr(artist_name=artist_name)
+    github_client.create_issue(artist_name=artist_name)
 
 
-def test_create_pr_does_not_create_pr_when_it_already_exists(github_client, httpx_mock):
+def test_create_issue_does_not_create_issue_when_it_already_exists(
+    github_client, httpx_mock
+):
     github_client.created_prs = ["hypocrisy"]
-    github_client.create_pr(artist_name="Hypocrisy")
+    github_client.create_issue(artist_name="Hypocrisy")
 
     assert len(httpx_mock.get_requests()) == 1
 
 
-def test_create_pr_raises_and_logs_exception_when_search_fails(
+def test_create_issue_raises_and_logs_exception_when_search_fails(
     caplog, github_client, httpx_mock
 ):
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="POST",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         json=error_message,
         status_code=500,
     )
 
     with pytest.raises(GitHubException):
-        github_client.create_pr(artist_name="Bloodbath")
+        github_client.create_issue(artist_name="Bloodbath")
 
     assert len(httpx_mock.get_requests()) == 2
 

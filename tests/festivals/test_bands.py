@@ -39,7 +39,7 @@ def spotify_client(spotify_envs, httpx_mock):
 def github_client(github_envs, httpx_mock):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
         json=[
             {"title": f"Search for ArtistInformation manually: {artist_that_has_pr}"},
@@ -123,7 +123,7 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
 
     httpx_mock.add_response(
         method="POST",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=201,
     )
 
@@ -194,7 +194,7 @@ async def test_get_dong_artists(spotify_client, github_client, httpx_mock):
 
     httpx_mock.add_response(
         method="POST",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=201,
     )
 
@@ -309,7 +309,7 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
 
     httpx_mock.add_response(
         method="POST",
-        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=201,
     )
 

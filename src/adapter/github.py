@@ -16,14 +16,14 @@ class GitHubClient:
             ]
         )
         self.token = github_pr_secret[github_pr_token]
-        self.created_prs = self._retrieve_bands_with_pr()
+        self.created_prs = self._retrieve_bands_with_created_issues()
 
-    def create_pr(self, *, artist_name: str) -> None:
+    def create_issue(self, *, artist_name: str) -> None:
         if artist_name.lower() in self.created_prs:
             logger.info(f"PR for {artist_name} already exists")
             return
         response = httpx.post(
-            "https://api.github.com/repos/kruspe/festival-scraper/pulls",
+            "https://api.github.com/repos/kruspe/festival-scraper/issues",
             headers={
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {self.token}",
@@ -31,9 +31,8 @@ class GitHubClient:
             },
             json={
                 "title": f"Search for ArtistInformation manually: {artist_name}",
-                "head": f"kruspe:artistInfo_{artist_name}",
-                "base": "main",
                 "body": f"Could not find ArtistInformation for {artist_name}. Please look them up manually.",
+                "assignee": "kruspe",
             },
         )
         if response.status_code != 201:
@@ -45,9 +44,9 @@ class GitHubClient:
             )
             raise GitHubException("Failed to create PR")
 
-    def _retrieve_bands_with_pr(self) -> list[str]:
+    def _retrieve_bands_with_created_issues(self) -> list[str]:
         response = httpx.get(
-            "https://api.github.com/repos/kruspe/festival-scraper/pulls",
+            "https://api.github.com/repos/kruspe/festival-scraper/issues",
             headers={
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {self.token}",
