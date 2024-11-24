@@ -95,7 +95,6 @@ def test_create_issue_calls_correct_endpoint(github_client, httpx_mock):
             {
                 "title": f"Search for ArtistInformation manually: {artist_name}",
                 "body": f"Could not find ArtistInformation for {artist_name}. Please look them up manually.",
-                "assignee": "kruspe",
             }
         ).encode("utf-8"),
         match_headers={
