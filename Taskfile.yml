@@ -7,7 +7,7 @@ tasks:
     - task: test
   install:
     desc: Install all dependencies
-    cmds: [ uv sync ]
+    cmds: [ uv sync --all-extras --dev ]
   format:
     cmds:
     - uv run ruff format
