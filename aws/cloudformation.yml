@@ -43,6 +43,7 @@ Resources:
             Resource:
             - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/spotify/client-id
             - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/spotify/client-secret
+            - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/github/festival-scraper/pr-token
   InvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
