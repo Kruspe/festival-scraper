@@ -74,6 +74,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         url=spotify_search_bloodbath_url,
         json=spotify_search_bloodbath_response,
         status_code=200,
+        is_reusable=True,
     )
 
     s3_client: S3Client = boto3.client("s3")

@@ -7,19 +7,19 @@ tasks:
     - task: test
   install:
     desc: Install all dependencies
-    cmds: [ rye sync ]
+    cmds: [ uv sync ]
   format:
     cmds:
-    - rye lint
-    - rye fmt
+    - uv run ruff format
+    - uv run ruff check --fix
   test:
     desc: Run all tests
-    cmds: [ rye run pytest ]
+    cmds: [ uv run pytest ]
   build:
     desc: Build and zip everything for a lambda deployment
     cmds:
       - rm -rf dist
-      - pip install --target ./dist -r requirements.lock
+      - uv pip install --target ./dist -r pyproject.toml
       - task: zip
       - zip -r dist/festival-scraper.zip src
       - zip -r dist/festival-scraper.zip handler.py
