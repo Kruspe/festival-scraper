@@ -6,6 +6,7 @@ from typing import Mapping
 
 import boto3
 
+from src.adapter.github import GitHubClient
 from src.adapter.s3 import S3
 from src.adapter.ssm import Ssm
 from src.adapter.spotify import SpotifyClient, ArtistInformation
@@ -17,11 +18,21 @@ def _configure_logger():
     logging.root.setLevel(level=logging.getLevelName(log_level_name))
 
 
-async def _handle(*, s3: S3, spotify_client: SpotifyClient):
+async def _handle(
+    *, s3: S3, spotify_client: SpotifyClient, github_client: GitHubClient
+):
     async with asyncio.TaskGroup() as tg:
-        wacken_task = tg.create_task(get_wacken_artists(spotify_client=spotify_client))
-        dong_task = tg.create_task(get_dong_artists(spotify_client=spotify_client))
-        rude_task = tg.create_task(get_rude_artists(spotify_client=spotify_client))
+        wacken_task = tg.create_task(
+            get_wacken_artists(
+                spotify_client=spotify_client, github_client=github_client
+            )
+        )
+        dong_task = tg.create_task(
+            get_dong_artists(spotify_client=spotify_client, github_client=github_client)
+        )
+        rude_task = tg.create_task(
+            get_rude_artists(spotify_client=spotify_client, github_client=github_client)
+        )
 
     wacken_artists: Mapping[str, ArtistInformation] = wacken_task.result()
     wacken_body = []
@@ -59,5 +70,8 @@ def handler(event, context):
     s3 = S3(s3_client=(boto3.client("s3")))
     ssm = Ssm(ssm_client=(boto3.client("ssm", "eu-west-1")))
     spotify_client = SpotifyClient(ssm=ssm)
+    github_client = GitHubClient(ssm=ssm)
 
-    asyncio.run(_handle(s3=s3, spotify_client=spotify_client))
+    asyncio.run(
+        _handle(s3=s3, spotify_client=spotify_client, github_client=github_client)
+    )

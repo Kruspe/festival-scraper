@@ -106,6 +106,7 @@ async def test_search_artist_calls_correct_endpoint(spotify_client, httpx_mock):
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Swedish Death Metal"],
                         "images": [
                             {
@@ -157,6 +158,7 @@ async def test_search_artist_raises_and_logs_exception_when_search_fails(
 @pytest.mark.asyncio
 async def test_search_artist_returns_artist_information(spotify_client, httpx_mock):
     artist_name = "Bloodbath"
+    artist_id = "RandomSpotifyId"
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
@@ -164,6 +166,7 @@ async def test_search_artist_returns_artist_information(spotify_client, httpx_mo
             "artists": {
                 "items": [
                     {
+                        "id": artist_id,
                         "genres": ["Heavy Rock", "Swedish Death Metal"],
                         "images": [
                             {
@@ -184,7 +187,7 @@ async def test_search_artist_returns_artist_information(spotify_client, httpx_mo
         name=artist_name, genres=["metal"]
     )
     assert artist_information == ArtistInformation(
-        name=artist_name, image_url=expected_bloodbath_image_url
+        id=artist_id, name=artist_name, image_url=expected_bloodbath_image_url
     )
 
 
@@ -199,6 +202,7 @@ async def test_search_artist_returns_no_image_url_when_name_does_not_match_exact
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Swedish Death Metal"],
                         "images": [
                             {
@@ -218,7 +222,9 @@ async def test_search_artist_returns_no_image_url_when_name_does_not_match_exact
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
+    assert artist_information == ArtistInformation(
+        id=None, name="Bloodbath", image_url=None
+    )
 
 
 @pytest.mark.asyncio
@@ -239,7 +245,9 @@ async def test_search_artist_returns_no_image_url_when_no_artists_are_found(
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
+    assert artist_information == ArtistInformation(
+        id=None, name="Bloodbath", image_url=None
+    )
 
 
 @pytest.mark.asyncio
@@ -253,6 +261,7 @@ async def test_search_artist_returns_no_image_url_when_genre_does_not_match(
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Indie Pop"],
                         "images": [
                             {
@@ -272,7 +281,9 @@ async def test_search_artist_returns_no_image_url_when_genre_does_not_match(
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
+    assert artist_information == ArtistInformation(
+        id=None, name="Bloodbath", image_url=None
+    )
 
 
 @pytest.mark.asyncio
@@ -286,6 +297,7 @@ async def test_search_artist_returns_no_image_url_when_no_images_are_found(
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Swedish Death Metal"],
                         "images": [],
                         "name": "Bloodbath",
@@ -299,7 +311,9 @@ async def test_search_artist_returns_no_image_url_when_no_images_are_found(
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
+    assert artist_information == ArtistInformation(
+        id=None, name="Bloodbath", image_url=None
+    )
 
 
 @pytest.mark.asyncio
@@ -313,6 +327,7 @@ async def test_search_artist_returns_first_match_when_more_are_available(
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Indie Pop"],
                         "images": [
                             {
@@ -324,6 +339,7 @@ async def test_search_artist_returns_first_match_when_more_are_available(
                         "name": "Bloodbath",
                     },
                     {
+                        "id": "CorrectSpotifyId",
                         "genres": ["Swedish Death Metal"],
                         "images": [
                             {
@@ -335,6 +351,7 @@ async def test_search_artist_returns_first_match_when_more_are_available(
                         "name": "Bloodbath",
                     },
                     {
+                        "id": "YetAnotherRandomSpotifyId",
                         "genres": ["Heavy Metal"],
                         "images": [
                             {
@@ -355,7 +372,7 @@ async def test_search_artist_returns_first_match_when_more_are_available(
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="CorrectSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
     )
 
 
@@ -370,6 +387,7 @@ async def test_search_artist_returns_no_image_url_when_available_images_are_to_s
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Swedish Death Metal"],
                         "images": [
                             {
@@ -389,7 +407,9 @@ async def test_search_artist_returns_no_image_url_when_available_images_are_to_s
     artist_information = await spotify_client.search_artist(
         name="Bloodbath", genres=["Metal"]
     )
-    assert artist_information == ArtistInformation(name="Bloodbath", image_url=None)
+    assert artist_information == ArtistInformation(
+        id=None, name="Bloodbath", image_url=None
+    )
 
 
 @pytest.mark.asyncio
@@ -403,6 +423,7 @@ async def test_search_artist_returns_smallest_possible_image_bigger_than_300_wid
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Swedish Death Metal"],
                         "images": [
                             {
@@ -433,7 +454,7 @@ async def test_search_artist_returns_smallest_possible_image_bigger_than_300_wid
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
     )
 
 
@@ -448,6 +469,7 @@ async def test_search_artist_returns_matching_artist_if_one_genre_matches(
             "artists": {
                 "items": [
                     {
+                        "id": "RandomSpotifyId",
                         "genres": ["Heavy Rock", "Swedish Death", "Death Metal"],
                         "images": [
                             {
@@ -468,5 +490,5 @@ async def test_search_artist_returns_matching_artist_if_one_genre_matches(
         name="Bloodbath", genres=["NonExistingGenre", "Metal"]
     )
     assert artist_information == ArtistInformation(
-        name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
     )

@@ -3,6 +3,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
+from src.adapter.github import GitHubClient
 from src.adapter.spotify import SpotifyClient, ArtistInformation
 from src.adapter.ssm import Ssm
 from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
@@ -33,11 +34,24 @@ def spotify_client(spotify_envs, httpx_mock):
     yield SpotifyClient(ssm=ssm)
 
 
-def create_spotify_response(*, artist_name: str, image_url: str = None):
+@pytest.fixture
+def github_client(github_envs, httpx_mock):
+    ssm: Union[Mock, Ssm] = create_autospec(Ssm)
+    ssm.get_parameters.return_value = {
+        "/github/festival-scraper/pr-token": "gh_pr_token",
+    }
+
+    yield GitHubClient(ssm=ssm)
+
+
+def create_spotify_response(
+    *, artist_id: str = None, artist_name: str, image_url: str = None
+):
     return {
         "artists": {
             "items": [
                 {
+                    "id": artist_id,
                     "genres": ["Swedish Death Metal"],
                     "images": [
                         {
@@ -54,7 +68,7 @@ def create_spotify_response(*, artist_name: str, image_url: str = None):
 
 
 @pytest.mark.asyncio
-async def test_get_wacken_artists(spotify_client, httpx_mock):
+async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
     bloodbath = {"artist": {"title": "Bloodbath"}}
     vader = {"artist": {"title": "Vader"}}
     metal_disco = {"artist": {"title": "Metal Disco"}}
@@ -63,14 +77,17 @@ async def test_get_wacken_artists(spotify_client, httpx_mock):
 
     image_url = "https://some-image-url.com"
     expected_result = {
-        "Bloodbath": ArtistInformation(name="Bloodbath", image_url=image_url),
-        "Vader": ArtistInformation(name="Vader", image_url=None),
+        "Bloodbath": ArtistInformation(
+            id="RandomSpotifyId", name="Bloodbath", image_url=image_url
+        ),
     }
 
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
-        json=create_spotify_response(artist_name="Bloodbath", image_url=image_url),
+        json=create_spotify_response(
+            artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
+        ),
         status_code=200,
     )
     httpx_mock.add_response(
@@ -84,18 +101,30 @@ async def test_get_wacken_artists(spotify_client, httpx_mock):
         method="GET", url=wacken_url, json=artist_response, status_code=200
     )
 
-    artist_information = await get_wacken_artists(spotify_client=spotify_client)
+    httpx_mock.add_response(
+        method="POST",
+        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        status_code=201,
+    )
+
+    artist_information = await get_wacken_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artist_information == expected_result
-    assert len(httpx_mock.get_requests()) == 4
+    assert len(httpx_mock.get_requests()) == 5
     assert httpx_mock.get_requests()[1].url == wacken_url
 
 
 @pytest.mark.asyncio
-async def test_get_wacken_artists_when_call_fails(spotify_client, httpx_mock):
+async def test_get_wacken_artists_when_call_fails(
+    spotify_client, github_client, httpx_mock
+):
     httpx_mock.add_response(method="GET", url=wacken_url, status_code=500)
 
-    artists = await get_wacken_artists(spotify_client=spotify_client)
+    artists = await get_wacken_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artists == {}
     assert len(httpx_mock.get_requests()) == 2
@@ -103,7 +132,7 @@ async def test_get_wacken_artists_when_call_fails(spotify_client, httpx_mock):
 
 
 @pytest.mark.asyncio
-async def test_get_dong_artists(spotify_client, httpx_mock):
+async def test_get_dong_artists(spotify_client, github_client, httpx_mock):
     image_url = "https://some-image-url.com"
     html_response = """
     <html>
@@ -125,26 +154,38 @@ async def test_get_dong_artists(spotify_client, httpx_mock):
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
-        json=create_spotify_response(artist_name="Bloodbath", image_url=image_url),
+        json=create_spotify_response(
+            artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
+        ),
     )
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Dawn of Disease",
-        json=create_spotify_response(artist_name="Dawn of Disease", image_url=None),
+        json=create_spotify_response(artist_name="Dawn of Disease"),
     )
-    artists = await get_dong_artists(spotify_client=spotify_client)
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        status_code=201,
+    )
+
+    artists = await get_dong_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artists == {
-        "Bloodbath": ArtistInformation(name="Bloodbath", image_url=image_url),
-        "Dawn of Disease": ArtistInformation(name="Dawn of Disease", image_url=None),
+        "Bloodbath": ArtistInformation(
+            id="RandomSpotifyId", name="Bloodbath", image_url=image_url
+        ),
     }
-    assert len(httpx_mock.get_requests()) == 4
+    assert len(httpx_mock.get_requests()) == 5
     assert httpx_mock.get_requests()[1].url == dong_url
 
 
 @pytest.mark.asyncio
 async def test_get_dong_artists_does_not_return_when_no_a_element_appears(
-    spotify_client, httpx_mock
+    spotify_client, github_client, httpx_mock
 ):
     image_url = "https://some-image-url.com"
     html_response = """
@@ -167,26 +208,36 @@ async def test_get_dong_artists_does_not_return_when_no_a_element_appears(
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
-        json=create_spotify_response(artist_name="Bloodbath", image_url=image_url),
+        json=create_spotify_response(
+            artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
+        ),
     )
-    artists = await get_dong_artists(spotify_client=spotify_client)
+    artists = await get_dong_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artists == {
-        "Bloodbath": ArtistInformation(name="Bloodbath", image_url=image_url)
+        "Bloodbath": ArtistInformation(
+            id="RandomSpotifyId", name="Bloodbath", image_url=image_url
+        )
     }
 
 
 @pytest.mark.asyncio
-async def test_get_dong_artists_when_call_fails(spotify_client, httpx_mock):
+async def test_get_dong_artists_when_call_fails(
+    spotify_client, github_client, httpx_mock
+):
     httpx_mock.add_response(method="GET", url=dong_url, status_code=500)
 
-    artists = await get_dong_artists(spotify_client=spotify_client)
+    artists = await get_dong_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artists == {}
 
 
 @pytest.mark.asyncio
-async def test_get_rude_artists(spotify_client, httpx_mock):
+async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
     image_url = "https://some-image-url.com"
     html_response = """
     <html>
@@ -208,27 +259,43 @@ async def test_get_rude_artists(spotify_client, httpx_mock):
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Marduk",
-        json=create_spotify_response(artist_name="Marduk", image_url=image_url),
+        json=create_spotify_response(
+            artist_id="RandomSpotifyId", artist_name="Marduk", image_url=image_url
+        ),
     )
     httpx_mock.add_response(
         method="GET",
         url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Deserted Fear",
-        json=create_spotify_response(artist_name="Deserted Fear", image_url=None),
+        json=create_spotify_response(artist_name="Deserted Fear"),
     )
-    artists = await get_rude_artists(spotify_client=spotify_client)
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        status_code=201,
+    )
+
+    artists = await get_rude_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artists == {
-        "Marduk": ArtistInformation(name="Marduk", image_url=image_url),
-        "Deserted Fear": ArtistInformation(name="Deserted Fear", image_url=None),
+        "Marduk": ArtistInformation(
+            id="RandomSpotifyId", name="Marduk", image_url=image_url
+        ),
     }
-    assert len(httpx_mock.get_requests()) == 4
+    assert len(httpx_mock.get_requests()) == 5
     assert httpx_mock.get_requests()[1].url == rude_url
 
 
 @pytest.mark.asyncio
-async def test_get_rude_artists_when_call_fails(spotify_client, httpx_mock):
+async def test_get_rude_artists_when_call_fails(
+    spotify_client, github_client, httpx_mock
+):
     httpx_mock.add_response(method="GET", url=rude_url, status_code=500)
 
-    artists = await get_rude_artists(spotify_client=spotify_client)
+    artists = await get_rude_artists(
+        spotify_client=spotify_client, github_client=github_client
+    )
 
     assert artists == {}

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ArtistInformation:
+    id: str | None
     name: str
     image_url: str | None
 
@@ -79,7 +80,7 @@ class SpotifyClient:
 
         found_artists = search_response_json["artists"]["items"]
         if len(found_artists) == 0:
-            return ArtistInformation(name=name, image_url=None)
+            return ArtistInformation(id=None, name=name, image_url=None)
 
         best_matches = []
         for artist in found_artists:
@@ -95,7 +96,7 @@ class SpotifyClient:
                 best_matches.append(artist)
 
         if len(best_matches) == 0:
-            return ArtistInformation(name=name, image_url=None)
+            return ArtistInformation(id=None, name=name, image_url=None)
 
         matching_information: list[ArtistInformation] = []
         for match in best_matches:
@@ -104,15 +105,18 @@ class SpotifyClient:
                     if image["width"] >= 300 or image["height"] >= 300:
                         matching_information.append(
                             ArtistInformation(
-                                name=match["name"], image_url=image["url"]
+                                id=match["id"],
+                                name=match["name"],
+                                image_url=image["url"],
                             )
                         )
                         break
 
         if len(matching_information) == 0:
-            return ArtistInformation(name=name, image_url=None)
+            return ArtistInformation(id=None, name=name, image_url=None)
 
         return ArtistInformation(
+            id=matching_information[0].id,
             name=matching_information[0].name,
             image_url=matching_information[0].image_url,
         )

@@ -5,11 +5,12 @@ import aiometer
 import httpx
 from bs4 import BeautifulSoup
 
+from src.adapter.github import GitHubClient
 from src.adapter.spotify import ArtistInformation, SpotifyClient
 
 
 async def get_wacken_artists(
-    *, spotify_client: SpotifyClient
+    *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> Mapping[str, ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.wacken.com/fileadmin/Json/bandlist-concert.json")
@@ -24,13 +25,15 @@ async def get_wacken_artists(
                 artist_names.append(artist["artist"]["title"])
 
     artist_information = await _retrieve_images(
-        spotify_client=spotify_client, artist_names=artist_names
+        spotify_client=spotify_client,
+        github_client=github_client,
+        artist_names=artist_names,
     )
     return artist_information
 
 
 async def get_dong_artists(
-    *, spotify_client: SpotifyClient
+    *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> Mapping[str, ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.dongopenair.de/de/bands/index")
@@ -45,13 +48,15 @@ async def get_dong_artists(
             artist_names.append(band_link.text)
 
     artist_information = await _retrieve_images(
-        spotify_client=spotify_client, artist_names=artist_names
+        spotify_client=spotify_client,
+        github_client=github_client,
+        artist_names=artist_names,
     )
     return artist_information
 
 
 async def get_rude_artists(
-    *, spotify_client: SpotifyClient
+    *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> Mapping[str, ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.rockunterdeneichen.de/bands/")
@@ -67,13 +72,18 @@ async def get_rude_artists(
             )
 
     artist_information = await _retrieve_images(
-        spotify_client=spotify_client, artist_names=artist_names
+        spotify_client=spotify_client,
+        github_client=github_client,
+        artist_names=artist_names,
     )
     return artist_information
 
 
 async def _retrieve_images(
-    *, spotify_client: SpotifyClient, artist_names: list[str]
+    *,
+    spotify_client: SpotifyClient,
+    github_client: GitHubClient,
+    artist_names: list[str],
 ) -> Mapping[str, ArtistInformation]:
     artist_information = await aiometer.run_all(
         [
@@ -90,5 +100,8 @@ async def _retrieve_images(
 
     result = {}
     for artist_info in artist_information:
+        if artist_info.id is None:
+            github_client.create_pr(artist_name=artist_info.name)
+            continue
         result[artist_info.name] = artist_info
     return result

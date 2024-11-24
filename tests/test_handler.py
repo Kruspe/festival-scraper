@@ -18,7 +18,7 @@ def setup_env():
 
 @mock_aws
 def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
-    spotify_envs, setup_env, httpx_mock
+    spotify_envs, github_envs, setup_env, httpx_mock
 ):
     wacken_bloodbath_response = [{"artist": {"title": "Bloodbath"}}]
     spotify_token_endpoint = "https://accounts.spotify.com/api/token"
@@ -34,6 +34,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         "artists": {
             "items": [
                 {
+                    "id": "RandomSpotifyId",
                     "genres": ["Swedish Death Metal"],
                     "images": [
                         {"height": 640, "url": "https://image_640.com", "width": 640},
@@ -89,6 +90,9 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     )
     ssm_client.put_parameter(
         Name="/spotify/client-secret", Value="value2", Type="SecureString"
+    )
+    ssm_client.put_parameter(
+        Name="/github/festival-scraper/pr-token", Value="value3", Type="SecureString"
     )
 
     wacken_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]

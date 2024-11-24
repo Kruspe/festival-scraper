@@ -10,3 +10,10 @@ def spotify_envs():
     yield
     del os.environ["SPOTIFY_CLIENT_ID_PARAMETER_NAME"]
     del os.environ["SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"]
+
+
+@pytest.fixture
+def github_envs():
+    os.environ["GITHUB_PR_TOKEN_PARAMETER_NAME"] = "/github/festival-scraper/pr-token"
+    yield
+    del os.environ["GITHUB_PR_TOKEN_PARAMETER_NAME"]
