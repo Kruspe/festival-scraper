@@ -67,9 +67,10 @@ async def get_rude_artists(
             "div", attrs={"class": "cb-article-meta"}
         )
         for element in artist_html_list:
-            artist_names.append(
-                element.find_next("h2").find_next("a").text.split(" (")[0]
-            )
+            found_artist = element.find_next("h2").find_next("a").text.split(" (")[0]
+            if found_artist == "RUNNING ORDER 2024":
+                continue
+            artist_names.append(found_artist)
 
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,

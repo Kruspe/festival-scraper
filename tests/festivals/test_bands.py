@@ -272,6 +272,11 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
         <body>
             <div class="cb-article-meta">
                 <h2>
+                    <a href="">RUNNING ORDER 2024</a>
+                </h2>
+            </div>
+            <div class="cb-article-meta">
+                <h2>
                     <a href="">Marduk (SWE)</a>
                 </h2>
             </div>
