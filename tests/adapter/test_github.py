@@ -26,7 +26,63 @@ def ssm_mock():
 
 @pytest.fixture
 def github_client(github_envs, ssm_mock, httpx_mock):
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        status_code=200,
+        json=[],
+        match_headers={
+            "Authorization": "Bearer gh_pr_token",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+
     yield GitHubClient(ssm=ssm_mock)
+
+
+def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx_mock):
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        status_code=200,
+        json=[
+            {"title": "Search for ArtistInformation manually: Bloodbath"},
+            {"title": "Some other PR"},
+        ],
+        match_headers={
+            "Authorization": "Bearer gh_pr_token",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+
+    client = GitHubClient(ssm=ssm_mock)
+    assert client.created_prs == ["Bloodbath"]
+
+
+def test_github_client_initializes_raises_and_logs_exception_during_initialization(
+    caplog, github_envs, ssm_mock, httpx_mock
+):
+    error_message = {"error": "error"}
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.github.com/repos/kruspe/festival-scraper/pulls",
+        json=error_message,
+        status_code=500,
+    )
+
+    with pytest.raises(GitHubException):
+        GitHubClient(ssm=ssm_mock)
+
+    assert len(httpx_mock.get_requests()) == 1
+
+    assert len(caplog.records) == 1
+    for record in caplog.records:
+        assert record.levelname == "ERROR"
+        assert (
+            record.getMessage()
+            == "GitHub request to retrieve PRs returned status 500, "
+            + str(error_message)
+        )
 
 
 def test_search_artist_calls_correct_endpoint(github_client, httpx_mock):
@@ -66,7 +122,7 @@ def test_search_artist_raises_and_logs_exception_when_search_fails(
     with pytest.raises(GitHubException):
         github_client.create_pr(artist_name="Bloodbath")
 
-    assert len(httpx_mock.get_requests()) == 1
+    assert len(httpx_mock.get_requests()) == 2
 
     assert len(caplog.records) == 1
     for record in caplog.records:
