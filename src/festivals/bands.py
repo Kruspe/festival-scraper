@@ -103,5 +103,6 @@ async def _retrieve_images(
         if artist_info.id is None:
             github_client.create_issue(artist_name=artist_info.name)
             continue
+        github_client.close_issue(artist_name=artist_info.name)
         result.append(artist_info)
     return result

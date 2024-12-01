@@ -53,9 +53,11 @@ class GitHubClient:
             )
             raise GitHubException("Failed to create PR")
 
-    def close_issue(self, *, issue_id: str) -> None:
+    def close_issue(self, *, artist_name: str) -> None:
+        if artist_name.lower() not in self.created_issues.keys():
+            return
         response = httpx.patch(
-            f"https://api.github.com/repos/kruspe/festival-scraper/issues/{issue_id}",
+            f"https://api.github.com/repos/kruspe/festival-scraper/issues/{self.created_issues[artist_name.lower()].id}",
             headers={
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {self.token}",

@@ -13,6 +13,8 @@ github_token_response = {
     "token_type": "bearer",
     "expires_in": 3600,
 }
+pre_existing_issue_id = "1"
+pre_existing_issue_artist_name = "Hypocrisy"
 
 
 @pytest.fixture
@@ -30,7 +32,12 @@ def github_client(github_envs, ssm_mock, httpx_mock):
         method="GET",
         url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
-        json=[],
+        json=[
+            {
+                "id": pre_existing_issue_id,
+                "title": f"Search for ArtistInformation manually: {pre_existing_issue_artist_name}",
+            }
+        ],
         match_headers={
             "Authorization": "Bearer gh_pr_token",
             "X-GitHub-Api-Version": "2022-11-28",
@@ -144,10 +151,9 @@ def test_create_issue_raises_and_logs_exception_when_search_fails(
 
 
 def test_close_issue_calls_correct_endpoint(github_client, httpx_mock):
-    issue_number = "123"
     httpx_mock.add_response(
         method="PATCH",
-        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{issue_number}",
+        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_id}",
         status_code=200,
         match_content=json.dumps(
             {"state": "closed", "state_reason": "completed"}
@@ -158,23 +164,22 @@ def test_close_issue_calls_correct_endpoint(github_client, httpx_mock):
         },
     )
 
-    github_client.close_issue(issue_id=issue_number)
+    github_client.close_issue(artist_name=pre_existing_issue_artist_name)
 
 
 def test_close_issue_raises_and_logs_exception_when_search_fails(
     caplog, github_client, httpx_mock
 ):
-    issue_number = "123"
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="PATCH",
-        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{issue_number}",
+        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_id}",
         json=error_message,
         status_code=500,
     )
 
     with pytest.raises(GitHubException):
-        github_client.close_issue(issue_id=issue_number)
+        github_client.close_issue(artist_name=pre_existing_issue_artist_name)
 
     assert len(httpx_mock.get_requests()) == 2
 
