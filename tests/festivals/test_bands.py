@@ -43,7 +43,7 @@ def github_client(github_envs, httpx_mock):
         status_code=200,
         json=[
             {
-                "id": "1",
+                "number": "1",
                 "title": f"Search for ArtistInformation manually: {artist_that_has_issue}",
             },
         ],

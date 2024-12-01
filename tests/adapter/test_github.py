@@ -13,7 +13,7 @@ github_token_response = {
     "token_type": "bearer",
     "expires_in": 3600,
 }
-pre_existing_issue_id = "1"
+pre_existing_issue_number = "1"
 pre_existing_issue_artist_name = "Hypocrisy"
 
 
@@ -34,7 +34,7 @@ def github_client(github_envs, ssm_mock, httpx_mock):
         status_code=200,
         json=[
             {
-                "id": pre_existing_issue_id,
+                "number": pre_existing_issue_number,
                 "title": f"Search for ArtistInformation manually: {pre_existing_issue_artist_name}",
             }
         ],
@@ -53,8 +53,11 @@ def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx
         url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
         json=[
-            {"id": "1", "title": "Search for ArtistInformation manually: Bloodbath"},
-            {"id": "2", "title": "Some other PR"},
+            {
+                "number": "1",
+                "title": "Search for ArtistInformation manually: Bloodbath",
+            },
+            {"number": "2", "title": "Some other PR"},
         ],
         match_headers={
             "Authorization": "Bearer gh_pr_token",
@@ -64,7 +67,7 @@ def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx
 
     client = GitHubClient(ssm=ssm_mock)
     assert client.created_issues == {
-        "bloodbath": GitHubIssue(id="1", artist_name="bloodbath")
+        "bloodbath": GitHubIssue(issue_number="1", artist_name="bloodbath")
     }
 
 
@@ -153,7 +156,7 @@ def test_create_issue_raises_and_logs_exception_when_search_fails(
 def test_close_issue_calls_correct_endpoint(github_client, httpx_mock):
     httpx_mock.add_response(
         method="PATCH",
-        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_id}",
+        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_number}",
         status_code=200,
         match_content=json.dumps(
             {"state": "closed", "state_reason": "completed"}
@@ -173,7 +176,7 @@ def test_close_issue_raises_and_logs_exception_when_search_fails(
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="PATCH",
-        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_id}",
+        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_number}",
         json=error_message,
         status_code=500,
     )
@@ -190,5 +193,5 @@ def test_close_issue_raises_and_logs_exception_when_search_fails(
             record.getMessage()
             == "GitHub request to close issue returned status 500, "
             + str(error_message)
-            + f" https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_id}"
+            + f" https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_number}"
         )

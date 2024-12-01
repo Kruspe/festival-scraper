@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class GitHubIssue:
-    id: str
+    issue_number: str
     artist_name: str
 
 
@@ -56,8 +56,9 @@ class GitHubClient:
     def close_issue(self, *, artist_name: str) -> None:
         if artist_name.lower() not in self.created_issues.keys():
             return
+        close_issue_url = f"https://api.github.com/repos/kruspe/festival-scraper/issues/{self.created_issues[artist_name.lower()].issue_number}"
         response = httpx.patch(
-            f"https://api.github.com/repos/kruspe/festival-scraper/issues/{self.created_issues[artist_name.lower()].id}",
+            close_issue_url,
             headers={
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {self.token}",
@@ -72,7 +73,7 @@ class GitHubClient:
                 + str(response.status_code)
                 + ", "
                 + str(response.json())
-                + f" https://api.github.com/repos/kruspe/festival-scraper/issues/{self.created_issues[artist_name.lower()].id}"
+                + f" {close_issue_url}"
             )
             raise GitHubException("Failed to close PR")
 
@@ -100,7 +101,7 @@ class GitHubClient:
             if "Search for ArtistInformation manually" in issue["title"]:
                 artist_name = issue["title"].split(": ")[1].lower()
                 result[artist_name] = GitHubIssue(
-                    id=issue["id"],
+                    issue_number=issue["number"],
                     artist_name=artist_name,
                 )
         return result
