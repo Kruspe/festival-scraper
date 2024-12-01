@@ -102,9 +102,27 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         Name="/github/festival-scraper/pr-token", Value="value3", Type="SecureString"
     )
 
-    wacken_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]
-    dong_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]
-    rude_expected_result = [{"artist": "Bloodbath", "image": "https://image_320.com"}]
+    wacken_expected_result = [
+        {
+            "id": "RandomSpotifyId",
+            "artist": "Bloodbath",
+            "image": "https://image_320.com",
+        }
+    ]
+    dong_expected_result = [
+        {
+            "id": "RandomSpotifyId",
+            "artist": "Bloodbath",
+            "image": "https://image_320.com",
+        }
+    ]
+    rude_expected_result = [
+        {
+            "id": "RandomSpotifyId",
+            "artist": "Bloodbath",
+            "image": "https://image_320.com",
+        }
+    ]
 
     handler(None, None)
 

@@ -90,11 +90,9 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
     artist_response = [bloodbath, vader, hypocrisy, metal_disco, metal_yoga]
 
     image_url = "https://some-image-url.com"
-    expected_result = {
-        "Bloodbath": ArtistInformation(
-            id="RandomSpotifyId", name="Bloodbath", image_url=image_url
-        ),
-    }
+    expected_result = [
+        ArtistInformation(id="RandomSpotifyId", name="Bloodbath", image_url=image_url)
+    ]
 
     httpx_mock.add_response(
         method="GET",
@@ -146,7 +144,7 @@ async def test_get_wacken_artists_when_call_fails(
         spotify_client=spotify_client, github_client=github_client
     )
 
-    assert artists == {}
+    assert artists == []
     assert len(httpx_mock.get_requests()) == 3
     assert httpx_mock.get_requests()[2].url == wacken_url
 
@@ -202,11 +200,9 @@ async def test_get_dong_artists(spotify_client, github_client, httpx_mock):
         spotify_client=spotify_client, github_client=github_client
     )
 
-    assert artists == {
-        "Bloodbath": ArtistInformation(
-            id="RandomSpotifyId", name="Bloodbath", image_url=image_url
-        ),
-    }
+    assert artists == [
+        ArtistInformation(id="RandomSpotifyId", name="Bloodbath", image_url=image_url),
+    ]
     assert len(httpx_mock.get_requests()) == 7
     assert httpx_mock.get_requests()[2].url == dong_url
 
@@ -244,11 +240,9 @@ async def test_get_dong_artists_does_not_return_when_no_a_element_appears(
         spotify_client=spotify_client, github_client=github_client
     )
 
-    assert artists == {
-        "Bloodbath": ArtistInformation(
-            id="RandomSpotifyId", name="Bloodbath", image_url=image_url
-        )
-    }
+    assert artists == [
+        ArtistInformation(id="RandomSpotifyId", name="Bloodbath", image_url=image_url)
+    ]
 
 
 @pytest.mark.asyncio
@@ -261,7 +255,7 @@ async def test_get_dong_artists_when_call_fails(
         spotify_client=spotify_client, github_client=github_client
     )
 
-    assert artists == {}
+    assert artists == []
 
 
 @pytest.mark.asyncio
@@ -322,11 +316,9 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
         spotify_client=spotify_client, github_client=github_client
     )
 
-    assert artists == {
-        "Marduk": ArtistInformation(
-            id="RandomSpotifyId", name="Marduk", image_url=image_url
-        ),
-    }
+    assert artists == [
+        ArtistInformation(id="RandomSpotifyId", name="Marduk", image_url=image_url),
+    ]
     assert len(httpx_mock.get_requests()) == 7
     assert httpx_mock.get_requests()[2].url == rude_url
 
@@ -341,4 +333,4 @@ async def test_get_rude_artists_when_call_fails(
         spotify_client=spotify_client, github_client=github_client
     )
 
-    assert artists == {}
+    assert artists == []

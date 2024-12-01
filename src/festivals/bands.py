@@ -1,5 +1,4 @@
 import functools
-from typing import Mapping
 
 import aiometer
 import httpx
@@ -11,7 +10,7 @@ from src.adapter.spotify import ArtistInformation, SpotifyClient
 
 async def get_wacken_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
-) -> Mapping[str, ArtistInformation]:
+) -> list[ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.wacken.com/fileadmin/Json/bandlist-concert.json")
 
@@ -34,7 +33,7 @@ async def get_wacken_artists(
 
 async def get_dong_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
-) -> Mapping[str, ArtistInformation]:
+) -> list[ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.dongopenair.de/de/bands/index")
 
@@ -57,7 +56,7 @@ async def get_dong_artists(
 
 async def get_rude_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
-) -> Mapping[str, ArtistInformation]:
+) -> list[ArtistInformation]:
     artist_names = []
     response = httpx.get("https://www.rockunterdeneichen.de/bands/")
 
@@ -85,7 +84,7 @@ async def _retrieve_images(
     spotify_client: SpotifyClient,
     github_client: GitHubClient,
     artist_names: list[str],
-) -> Mapping[str, ArtistInformation]:
+) -> list[ArtistInformation]:
     artist_information = await aiometer.run_all(
         [
             functools.partial(
@@ -99,10 +98,10 @@ async def _retrieve_images(
         max_per_second=5,
     )
 
-    result = {}
+    result = []
     for artist_info in artist_information:
         if artist_info.id is None:
             github_client.create_issue(artist_name=artist_info.name)
             continue
-        result[artist_info.name] = artist_info
+        result.append(artist_info)
     return result

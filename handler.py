@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 import os
-from typing import Mapping
 
 import boto3
 
@@ -34,30 +33,36 @@ async def _handle(
             get_rude_artists(spotify_client=spotify_client, github_client=github_client)
         )
 
-    wacken_artists: Mapping[str, ArtistInformation] = wacken_task.result()
+    wacken_artists: list[ArtistInformation] = wacken_task.result()
     wacken_body = []
-    for artist in wacken_artists.values():
-        wacken_body.append({"artist": artist.name, "image": artist.image_url})
+    for artist in wacken_artists:
+        wacken_body.append(
+            {"id": artist.id, "artist": artist.name, "image": artist.image_url}
+        )
     s3.upload(
         bucket_name=os.getenv("FESTIVAL_ARTISTS_BUCKET"),
         key="wacken.json",
         json=json.dumps(wacken_body),
     )
 
-    dong_artists: Mapping[str, ArtistInformation] = dong_task.result()
+    dong_artists: list[ArtistInformation] = dong_task.result()
     dong_body = []
-    for artist in dong_artists.values():
-        dong_body.append({"artist": artist.name, "image": artist.image_url})
+    for artist in dong_artists:
+        dong_body.append(
+            {"id": artist.id, "artist": artist.name, "image": artist.image_url}
+        )
     s3.upload(
         bucket_name=os.getenv("FESTIVAL_ARTISTS_BUCKET"),
         key="dong.json",
         json=json.dumps(dong_body),
     )
 
-    rude_artists: Mapping[str, ArtistInformation] = rude_task.result()
+    rude_artists: list[ArtistInformation] = rude_task.result()
     rude_body = []
-    for artist in rude_artists.values():
-        rude_body.append({"artist": artist.name, "image": artist.image_url})
+    for artist in rude_artists:
+        rude_body.append(
+            {"id": artist.id, "artist": artist.name, "image": artist.image_url}
+        )
     s3.upload(
         bucket_name=os.getenv("FESTIVAL_ARTISTS_BUCKET"),
         key="rude.json",
