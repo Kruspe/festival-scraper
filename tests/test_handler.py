@@ -55,9 +55,9 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://www.dongopenair.de/de/bands/index",
+        url="https://www.dongopenair.de/bands/",
         status_code=200,
-        text="<div class='bandteaser'><a>Bloodbath</a>></div>",
+        text="<a href='https://www.dongopenair.de/band-details/?band=Bloodbath' style='color: #ffffff' z-index='1'>Bloodbath</a>",
     )
     httpx_mock.add_response(
         method="GET",

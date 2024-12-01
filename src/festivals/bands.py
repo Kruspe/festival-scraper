@@ -35,16 +35,20 @@ async def get_dong_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> list[ArtistInformation]:
     artist_names = []
-    response = httpx.get("https://www.dongopenair.de/de/bands/index")
+    response = httpx.get("https://www.dongopenair.de/bands/")
 
     if response.status_code == 200:
         parsed_html = BeautifulSoup(response.text, features="html.parser")
-        artist_html_list = parsed_html.find_all("div", attrs={"class": "bandteaser"})
-        for element in artist_html_list:
-            band_link = element.a
-            if band_link is None:
-                continue
-            artist_names.append(band_link.text)
+        artist_links = parsed_html.find_all("a")
+        for artist_link in artist_links:
+            if (
+                artist_link.get("href") is not None
+                and artist_link.get("href").startswith(
+                    "https://www.dongopenair.de/band-details/?band="
+                )
+                and artist_link.text != ""
+            ):
+                artist_names.append(artist_link.text)
 
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
