@@ -66,6 +66,7 @@ Resources:
           SPOTIFY_CLIENT_SECRET_PARAMETER_NAME: /spotify/client-secret
           GITHUB_PR_TOKEN_PARAMETER_NAME: /github/festival-scraper/pr-token
           LOG_LEVEL: ERROR
+          DEBUG_ARTIST_NAME: ""
       Code:
         S3Bucket: !Ref ParamDeploymentBucketName
         S3Key: festival-scraper.zip
