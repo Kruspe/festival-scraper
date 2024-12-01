@@ -64,7 +64,7 @@ class SpotifyClient:
     async def search_artist(self, *, name: str, genres: list[str]) -> ArtistInformation:
         search_response = await self.client.get(
             "https://api.spotify.com/v1/search",
-            params={"type": "artist", "limit": 5, "q": name},
+            params={"type": "artist", "limit": 5, "q": name, "market": "DE"},
             headers={"Authorization": "Bearer " + self.token},
         )
         search_response_status_code = search_response.status_code

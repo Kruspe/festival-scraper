@@ -96,7 +96,7 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
 
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
         ),
@@ -104,13 +104,13 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Vader",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Vader&market=DE",
         json=create_spotify_response(artist_name="Vader"),
         status_code=200,
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_pr}",
+        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_pr}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_pr),
         status_code=200,
     )
@@ -174,19 +174,19 @@ async def test_get_dong_artists(spotify_client, github_client, httpx_mock):
     httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
         ),
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Dawn of Disease",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Dawn of Disease&market=DE",
         json=create_spotify_response(artist_name="Dawn of Disease"),
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_pr}",
+        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_pr}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_pr),
     )
 
@@ -231,7 +231,7 @@ async def test_get_dong_artists_does_not_return_when_no_a_element_appears(
     httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
         ),
@@ -290,19 +290,19 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
     httpx_mock.add_response(method="GET", url=rude_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Marduk",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Marduk&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Marduk", image_url=image_url
         ),
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Deserted Fear",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Deserted Fear&market=DE",
         json=create_spotify_response(artist_name="Deserted Fear"),
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_pr}",
+        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_pr}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_pr),
     )
 
