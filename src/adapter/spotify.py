@@ -33,6 +33,13 @@ class SpotifyClient:
         self.client_secret = spotify_secrets[client_secret_parameter_name]
         self.token = self._get_token()
         self.client = httpx.AsyncClient()
+        self.exception_map = {
+            "Hanabie": ArtistInformation(
+                id="4N2I7VsF86h59tbsvVoB1h",
+                name="Hanabie",
+                image_url="https://i.scdn.co/image/ab6761610000e5ebde4fabc8a9d57b304c23706a",
+            )
+        }
 
     def _get_token(self) -> str:
         encoded_credentials = b64encode(
@@ -62,6 +69,8 @@ class SpotifyClient:
         return token_response_json["access_token"]
 
     async def search_artist(self, *, name: str, genres: list[str]) -> ArtistInformation:
+        if name in self.exception_map:
+            return self.exception_map[name]
         search_response = await self.client.get(
             "https://api.spotify.com/v1/search",
             params={"type": "artist", "limit": 5, "q": name, "market": "DE"},

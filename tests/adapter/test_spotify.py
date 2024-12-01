@@ -492,3 +492,19 @@ async def test_search_artist_returns_matching_artist_if_one_genre_matches(
     assert artist_information == ArtistInformation(
         id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
     )
+
+
+@pytest.mark.asyncio
+async def test_search_artist_returns_artists_from_exception_map(
+    spotify_client, httpx_mock
+):
+    expected_artist_information = ArtistInformation(
+        id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
+    )
+    spotify_client.exception_map = {"Bloodbath": expected_artist_information}
+    artist_information = await spotify_client.search_artist(
+        name="Bloodbath", genres=["Metal"]
+    )
+
+    assert len(httpx_mock.get_requests()) == 1
+    assert artist_information == expected_artist_information
