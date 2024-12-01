@@ -62,6 +62,9 @@ class SpotifyClient:
         return token_response_json["access_token"]
 
     async def search_artist(self, *, name: str, genres: list[str]) -> ArtistInformation:
+        logger.info(
+            f"Searching artist: {name}; https://api.spotify.com/v1/search?type=artist&limit=5&q={name}"
+        )
         search_response = await self.client.get(
             "https://api.spotify.com/v1/search",
             params={"type": "artist", "limit": 5, "q": name},
@@ -79,30 +82,44 @@ class SpotifyClient:
             raise SpotifyException("Spotify search response is invalid")
 
         found_artists = search_response_json["artists"]["items"]
+        logger.info("Spotify returned these results")
+        logger.info(found_artists)
         if len(found_artists) == 0:
+            logger.info(f"Not results for {name}")
             return ArtistInformation(id=None, name=name, image_url=None)
 
         best_matches = []
         for artist in found_artists:
             if artist["name"].lower() != name.lower():
+                logger.info(
+                    f"Skipping artist because of name mismatch, {artist['name']} != {name}"
+                )
                 continue
             if len(artist["genres"]) > 0:
+                logger.info(f"Checking genres: found {artist['genres']}")
                 for genre in genres:
                     for artist_genre in artist["genres"]:
                         if genre.lower() in artist_genre.lower():
+                            logger.info(f"FOUND! Adding {artist}")
                             best_matches.append(artist)
                             break
             else:
+                logger.info(f"Adding artist {artist} because no genres were found")
                 best_matches.append(artist)
 
         if len(best_matches) == 0:
+            logger.info(f"No match for {name}")
             return ArtistInformation(id=None, name=name, image_url=None)
 
         matching_information: list[ArtistInformation] = []
+        logger.info("Searching for a good image size")
         for match in best_matches:
             if len(match["images"]) > 0:
                 for image in reversed(match["images"]):
                     if image["width"] >= 300 or image["height"] >= 300:
+                        logger.info(
+                            f"Found image {image['url']} with size {image['width']}x{image['height']}"
+                        )
                         matching_information.append(
                             ArtistInformation(
                                 id=match["id"],
@@ -113,6 +130,7 @@ class SpotifyClient:
                         break
 
         if len(matching_information) == 0:
+            logger.info(f"No images for {name}")
             return ArtistInformation(id=None, name=name, image_url=None)
 
         return ArtistInformation(
