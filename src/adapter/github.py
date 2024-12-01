@@ -68,10 +68,11 @@ class GitHubClient:
 
         if response.status_code != 200:
             logger.error(
-                "GitHub request to close PR returned status "
+                "GitHub request to close issue returned status "
                 + str(response.status_code)
                 + ", "
                 + str(response.json())
+                + f" https://api.github.com/repos/kruspe/festival-scraper/issues/{self.created_issues[artist_name.lower()].id}"
             )
             raise GitHubException("Failed to close PR")
 

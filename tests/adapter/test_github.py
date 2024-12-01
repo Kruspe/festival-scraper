@@ -188,5 +188,7 @@ def test_close_issue_raises_and_logs_exception_when_search_fails(
         assert record.levelname == "ERROR"
         assert (
             record.getMessage()
-            == "GitHub request to close PR returned status 500, " + str(error_message)
+            == "GitHub request to close issue returned status 500, "
+            + str(error_message)
+            + f" https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_id}"
         )
