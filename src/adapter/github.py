@@ -1,5 +1,8 @@
 import logging
 import os
+from dataclasses import dataclass
+from typing import Mapping
+
 import httpx
 
 from src.adapter.ssm import Ssm
@@ -7,19 +10,25 @@ from src.adapter.ssm import Ssm
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class GitHubIssue:
+    id: str
+    artist_name: str
+
+
 class GitHubClient:
     def __init__(self, *, ssm: Ssm):
-        github_pr_token = os.environ.get("GITHUB_PR_TOKEN_PARAMETER_NAME")
-        github_pr_secret = ssm.get_parameters(
+        github_token = os.environ.get("GITHUB_TOKEN_PARAMETER_NAME")
+        github_secret = ssm.get_parameters(
             parameter_names=[
-                github_pr_token,
+                github_token,
             ]
         )
-        self.token = github_pr_secret[github_pr_token]
-        self.created_prs = self._retrieve_bands_with_created_issues()
+        self.token = github_secret[github_token]
+        self.created_issues = self._retrieve_bands_with_created_issues()
 
     def create_issue(self, *, artist_name: str) -> None:
-        if artist_name.lower() in self.created_prs:
+        if artist_name.lower() in self.created_issues:
             logger.info(f"PR for {artist_name} already exists")
             return
         response = httpx.post(
@@ -44,7 +53,27 @@ class GitHubClient:
             )
             raise GitHubException("Failed to create PR")
 
-    def _retrieve_bands_with_created_issues(self) -> list[str]:
+    def close_issue(self, *, issue_id: str) -> None:
+        response = httpx.patch(
+            f"https://api.github.com/repos/kruspe/festival-scraper/issues/{issue_id}",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {self.token}",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+            json={"state": "closed", "state_reason": "completed"},
+        )
+
+        if response.status_code != 200:
+            logger.error(
+                "GitHub request to close PR returned status "
+                + str(response.status_code)
+                + ", "
+                + str(response.json())
+            )
+            raise GitHubException("Failed to close PR")
+
+    def _retrieve_bands_with_created_issues(self) -> Mapping[str, GitHubIssue]:
         response = httpx.get(
             "https://api.github.com/repos/kruspe/festival-scraper/issues",
             headers={
@@ -63,10 +92,14 @@ class GitHubClient:
             )
             raise GitHubException("Failed to retrieve PRs")
 
-        result = []
-        for pr in response.json():
-            if "Search for ArtistInformation manually" in pr["title"]:
-                result.append(pr["title"].split(": ")[1].lower())
+        result = {}
+        for issue in response.json():
+            if "Search for ArtistInformation manually" in issue["title"]:
+                artist_name = issue["title"].split(": ")[1].lower()
+                result[artist_name] = GitHubIssue(
+                    id=issue["id"],
+                    artist_name=artist_name,
+                )
         return result
 
 

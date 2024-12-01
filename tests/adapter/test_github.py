@@ -4,7 +4,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from src.adapter.github import GitHubClient, GitHubException
+from src.adapter.github import GitHubClient, GitHubException, GitHubIssue
 from src.adapter.ssm import Ssm
 
 github_token_endpoint = "https://accounts.spotify.com/api/token"
@@ -46,8 +46,8 @@ def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx
         url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
         json=[
-            {"title": "Search for ArtistInformation manually: Bloodbath"},
-            {"title": "Some other PR"},
+            {"id": "1", "title": "Search for ArtistInformation manually: Bloodbath"},
+            {"id": "2", "title": "Some other PR"},
         ],
         match_headers={
             "Authorization": "Bearer gh_pr_token",
@@ -56,7 +56,9 @@ def test_github_client_initializes_with_created_prs(github_envs, ssm_mock, httpx
     )
 
     client = GitHubClient(ssm=ssm_mock)
-    assert client.created_prs == ["bloodbath"]
+    assert client.created_issues == {
+        "bloodbath": GitHubIssue(id="1", artist_name="bloodbath")
+    }
 
 
 def test_github_client_initializes_raises_and_logs_exception_during_initialization(
@@ -110,7 +112,7 @@ def test_create_issue_calls_correct_endpoint(github_client, httpx_mock):
 def test_create_issue_does_not_create_issue_when_it_already_exists(
     github_client, httpx_mock
 ):
-    github_client.created_prs = ["hypocrisy"]
+    github_client.created_issues = ["hypocrisy"]
     github_client.create_issue(artist_name="Hypocrisy")
 
     assert len(httpx_mock.get_requests()) == 1
@@ -138,4 +140,48 @@ def test_create_issue_raises_and_logs_exception_when_search_fails(
         assert (
             record.getMessage()
             == "GitHub request to create PR returned status 500, " + str(error_message)
+        )
+
+
+def test_close_issue_calls_correct_endpoint(github_client, httpx_mock):
+    issue_number = "123"
+    httpx_mock.add_response(
+        method="PATCH",
+        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{issue_number}",
+        status_code=200,
+        match_content=json.dumps(
+            {"state": "closed", "state_reason": "completed"}
+        ).encode("utf-8"),
+        match_headers={
+            "Authorization": "Bearer gh_pr_token",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+
+    github_client.close_issue(issue_id=issue_number)
+
+
+def test_close_issue_raises_and_logs_exception_when_search_fails(
+    caplog, github_client, httpx_mock
+):
+    issue_number = "123"
+    error_message = {"error": "error"}
+    httpx_mock.add_response(
+        method="PATCH",
+        url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{issue_number}",
+        json=error_message,
+        status_code=500,
+    )
+
+    with pytest.raises(GitHubException):
+        github_client.close_issue(issue_id=issue_number)
+
+    assert len(httpx_mock.get_requests()) == 2
+
+    assert len(caplog.records) == 1
+    for record in caplog.records:
+        assert record.levelname == "ERROR"
+        assert (
+            record.getMessage()
+            == "GitHub request to close PR returned status 500, " + str(error_message)
         )

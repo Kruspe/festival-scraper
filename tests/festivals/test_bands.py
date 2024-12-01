@@ -42,7 +42,10 @@ def github_client(github_envs, httpx_mock):
         url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=200,
         json=[
-            {"title": f"Search for ArtistInformation manually: {artist_that_has_pr}"},
+            {
+                "id": "1",
+                "title": f"Search for ArtistInformation manually: {artist_that_has_pr}",
+            },
         ],
         match_headers={
             "Authorization": "Bearer gh_pr_token",

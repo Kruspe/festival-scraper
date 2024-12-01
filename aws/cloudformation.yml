@@ -64,7 +64,7 @@ Resources:
           FESTIVAL_ARTISTS_BUCKET: !Ref ParamFestivalBucketName
           SPOTIFY_CLIENT_ID_PARAMETER_NAME: /spotify/client-id
           SPOTIFY_CLIENT_SECRET_PARAMETER_NAME: /spotify/client-secret
-          GITHUB_PR_TOKEN_PARAMETER_NAME: /github/festival-scraper/pr-token
+          GITHUB_TOKEN_PARAMETER_NAME: /github/festival-scraper/pr-token
           LOG_LEVEL: ERROR
           DEBUG_ARTIST_NAME: ""
       Code:
