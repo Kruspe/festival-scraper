@@ -38,7 +38,32 @@ class SpotifyClient:
                 id="4N2I7VsF86h59tbsvVoB1h",
                 name="Hanabie",
                 image_url="https://i.scdn.co/image/ab6761610000e5ebde4fabc8a9d57b304c23706a",
-            )
+            ),
+            "ATTIC": ArtistInformation(
+                id="5z9ci33r73qjiOqk1wmuY9",
+                name="Attic",
+                image_url="https://i.scdn.co/image/ab67616100005174cc1a1ab23574e34fc7693f24"
+            ),
+            "POWERSLAVE": ArtistInformation(
+                id="POWERSLAVE",
+                name="POWERSLAVE",
+                image_url=None
+            ),
+            "Kissin` Dynamite": ArtistInformation(
+                id="2wSP2cFfkqg4LKu1pmkTWx",
+                name="Kissin' Dynamite",
+                image_url="https://i.scdn.co/image/ab67616100005174f8e1f25d44ea876f05d70c46",
+            ),
+            "Tarja & Marko Hietela": ArtistInformation(
+                id="Tarja & Marko Hietela",
+                name="Tarja & Marko Hietela",
+                image_url=None,
+            ),
+            "Weckörhead": ArtistInformation(
+                id="44pq4JEhpX9dg5BbZlJGZg",
+                name="Weckörhead",
+                image_url=None,
+            ),
         }
 
     def _get_token(self) -> str:
