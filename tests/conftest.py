@@ -7,11 +7,9 @@ import pytest
 def spotify_envs():
     os.environ["SPOTIFY_CLIENT_ID_PARAMETER_NAME"] = "/spotify/client-id"
     os.environ["SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"] = "/spotify/client-secret"
-    os.environ["DEBUG_ARTIST_NAME"] = ""
     yield
     del os.environ["SPOTIFY_CLIENT_ID_PARAMETER_NAME"]
     del os.environ["SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"]
-    del os.environ["DEBUG_ARTIST_NAME"]
 
 
 @pytest.fixture

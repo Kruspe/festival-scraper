@@ -42,12 +42,10 @@ class SpotifyClient:
             "ATTIC": ArtistInformation(
                 id="5z9ci33r73qjiOqk1wmuY9",
                 name="Attic",
-                image_url="https://i.scdn.co/image/ab67616100005174cc1a1ab23574e34fc7693f24"
+                image_url="https://i.scdn.co/image/ab67616100005174cc1a1ab23574e34fc7693f24",
             ),
             "POWERSLAVE": ArtistInformation(
-                id="POWERSLAVE",
-                name="POWERSLAVE",
-                image_url=None
+                id="POWERSLAVE", name="POWERSLAVE", image_url=None
             ),
             "Kissin` Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
@@ -113,9 +111,10 @@ class SpotifyClient:
             raise SpotifyException("Spotify search response is invalid")
 
         found_artists = search_response_json["artists"]["items"]
-        if name in os.getenv("DEBUG_ARTIST_NAME").split(","):
-            logger.info(f"{name}: {found_artists}")
         if len(found_artists) == 0:
+            logger.error(
+                f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
+            )
             return ArtistInformation(id=None, name=name, image_url=None)
 
         best_matches = []
@@ -132,6 +131,9 @@ class SpotifyClient:
                 best_matches.append(artist)
 
         if len(best_matches) == 0:
+            logger.error(
+                f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
+            )
             return ArtistInformation(id=None, name=name, image_url=None)
 
         matching_information: list[ArtistInformation] = []
@@ -149,6 +151,9 @@ class SpotifyClient:
                         break
 
         if len(matching_information) == 0:
+            logger.error(
+                f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
+            )
             return ArtistInformation(id=None, name=name, image_url=None)
 
         return ArtistInformation(
