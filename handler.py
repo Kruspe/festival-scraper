@@ -30,7 +30,30 @@ async def _handle(
             get_dong_artists(spotify_client=spotify_client, github_client=github_client)
         )
         rude_task = tg.create_task(
-            get_rude_artists(spotify_client=spotify_client, github_client=github_client, artists=["Rotting Christ", "Soulfly", "Naglfar", "Anaal Nathrakh", "Stillbirth", "Robse", "Necrotted", "Space Chaser", "Embedded", "Wilt", "Black Adder", "Epidemic Scorn", "Yardfield Colony", "Menerra", "Maggots", "Out For Change", "Jack & Cöke", "Metal Worx"])
+            get_rude_artists(
+                spotify_client=spotify_client,
+                github_client=github_client,
+                artists=[
+                    "Rotting Christ",
+                    "Soulfly",
+                    "Naglfar",
+                    "Anaal Nathrakh",
+                    "Stillbirth",
+                    "Robse",
+                    "Necrotted",
+                    "Space Chaser",
+                    "Embedded",
+                    "Wilt",
+                    "Black Adder",
+                    "Epidemic Scorn",
+                    "Yardfield Colony",
+                    "Menerra",
+                    "Maggots",
+                    "Out For Change",
+                    "Jack & Cöke",
+                    "Metal Worx",
+                ],
+            )
         )
 
     wacken_artists: list[ArtistInformation] = wacken_task.result()

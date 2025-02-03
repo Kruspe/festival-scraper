@@ -59,7 +59,10 @@ async def get_dong_artists(
 
 
 async def get_rude_artists(
-    *, spotify_client: SpotifyClient, github_client: GitHubClient, artists: list[str] = None
+    *,
+    spotify_client: SpotifyClient,
+    github_client: GitHubClient,
+    artists: list[str] = None,
 ) -> list[ArtistInformation]:
     artist_names = []
 
@@ -74,7 +77,9 @@ async def get_rude_artists(
                 "div", attrs={"class": "cb-article-meta"}
             )
             for element in artist_html_list:
-                found_artist = element.find_next("h2").find_next("a").text.split(" (")[0]
+                found_artist = (
+                    element.find_next("h2").find_next("a").text.split(" (")[0]
+                )
                 if found_artist == "RUNNING ORDER 2024":
                     continue
                 artist_names.append(found_artist)
@@ -100,7 +105,8 @@ async def _retrieve_images(
                 name=artist_name,
                 genres=["Metal", "Rock", "Core", "Heavy", "MetalCore", "Thrash"],
             )
-            for artist_name in artist_names if artist_name != ""
+            for artist_name in artist_names
+            if artist_name != ""
         ],
         max_at_once=100,
         max_per_second=5,

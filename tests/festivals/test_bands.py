@@ -573,6 +573,7 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
     assert len(httpx_mock.get_requests()) == 7
     assert httpx_mock.get_requests()[2].url == rude_url
 
+
 @pytest.mark.asyncio
 async def test_get_rude_artists_uses_predefined_artist_names(
     spotify_client, github_client, httpx_mock
@@ -603,7 +604,9 @@ async def test_get_rude_artists_uses_predefined_artist_names(
     )
 
     artists = await get_rude_artists(
-        spotify_client=spotify_client, github_client=github_client, artists=["Marduk", "Deserted Fear", artist_that_has_issue]
+        spotify_client=spotify_client,
+        github_client=github_client,
+        artists=["Marduk", "Deserted Fear", artist_that_has_issue],
     )
 
     assert artists == [
