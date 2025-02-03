@@ -34,23 +34,28 @@ class SpotifyClient:
         self.token = self._get_token()
         self.client = httpx.AsyncClient()
         self.exception_map = {
-            "Hanabie": ArtistInformation(
-                id="4N2I7VsF86h59tbsvVoB1h",
-                name="Hanabie",
-                image_url="https://i.scdn.co/image/ab6761610000e5ebde4fabc8a9d57b304c23706a",
-            ),
             "ATTIC": ArtistInformation(
                 id="5z9ci33r73qjiOqk1wmuY9",
                 name="Attic",
                 image_url="https://i.scdn.co/image/ab67616100005174cc1a1ab23574e34fc7693f24",
             ),
-            "POWERSLAVE": ArtistInformation(
-                id="POWERSLAVE", name="POWERSLAVE", image_url=None
+            "Boomtown Rats": ArtistInformation(
+                id="40oYPr305MsT2lsiXr9fX9",
+                name="Boomtown Rats",
+                image_url="https://i.scdn"
+            ),
+            "Hanabie": ArtistInformation(
+                id="4N2I7VsF86h59tbsvVoB1h",
+                name="Hanabie",
+                image_url="https://i.scdn.co/image/ab6761610000e5ebde4fabc8a9d57b304c23706a",
             ),
             "Kissin` Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
                 name="Kissin' Dynamite",
-                image_url="https://i.scdn.co/image/ab67616100005174f8e1f25d44ea876f05d70c46",
+                image_url="https://i.scdn.co/image/ab6761610000e5eb650a6331f62d5671e3f8192c",
+            ),
+            "POWERSLAVE": ArtistInformation(
+                id="POWERSLAVE", name="POWERSLAVE", image_url=None
             ),
             "Tarja & Marko Hietela": ArtistInformation(
                 id="Tarja & Marko Hietela",
