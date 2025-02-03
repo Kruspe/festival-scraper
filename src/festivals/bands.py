@@ -1,4 +1,5 @@
 import functools
+import logging
 
 import aiometer
 import httpx
@@ -6,6 +7,9 @@ from bs4 import BeautifulSoup
 
 from src.adapter.github import GitHubClient
 from src.adapter.spotify import ArtistInformation, SpotifyClient
+
+logger = logging.getLogger(__name__)
+
 
 
 async def get_wacken_artists(
@@ -23,6 +27,7 @@ async def get_wacken_artists(
             ):
                 artist_names.append(artist["artist"]["title"])
 
+    logger.info("Wacken ArtistsL %s", artist_names)
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
         github_client=github_client,
@@ -50,6 +55,7 @@ async def get_dong_artists(
             ):
                 artist_names.append(artist_link.text)
 
+    logger.info("DONG ArtistsL %s", artist_names)
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
         github_client=github_client,
@@ -84,6 +90,7 @@ async def get_rude_artists(
                     continue
                 artist_names.append(found_artist)
 
+    logger.info("RUDE ArtistsL %s", artist_names)
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
         github_client=github_client,
