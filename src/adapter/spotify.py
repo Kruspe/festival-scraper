@@ -49,7 +49,7 @@ class SpotifyClient:
                 name="Hanabie",
                 image_url="https://i.scdn.co/image/ab6761610000e5ebde4fabc8a9d57b304c23706a",
             ),
-            "Kissin` Dynamite": ArtistInformation(
+            "Kissin’ Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
                 name="Kissin' Dynamite",
                 image_url="https://i.scdn.co/image/ab6761610000e5eb650a6331f62d5671e3f8192c",
