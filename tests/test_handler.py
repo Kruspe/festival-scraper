@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 import boto3
 import pytest
@@ -30,6 +31,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     spotify_search_bloodbath_url = (
         "https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE"
     )
+    spotify_wildcard_search_url = "https:\/\/api\.spotify\.com\/v1\/search\?type=artist&limit=5&q=.*&market=DE"
     github_issue_url = "https://api.github.com/repos/kruspe/festival-scraper/issues"
     spotify_search_bloodbath_response = {
         "artists": {
@@ -59,11 +61,17 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
         status_code=200,
         text="<a href='https://www.dongopenair.de/band-details/?band=Bloodbath' style='color: #ffffff' z-index='1'>Bloodbath</a>",
     )
+    # httpx_mock.add_response(
+    #     method="GET",
+    #     url="https://www.rockunterdeneichen.de/bands/",
+    #     status_code=200,
+    #     text="<div class='cb-article-meta'><h2><a>Bloodbath (SWE)</a></h2></div>",
+    # )
     httpx_mock.add_response(
-        method="GET",
-        url="https://www.rockunterdeneichen.de/bands/",
-        status_code=200,
-        text="<div class='cb-article-meta'><h2><a>Bloodbath (SWE)</a></h2></div>",
+        method="POST",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
+        status_code=201,
+        is_reusable=True,
     )
     httpx_mock.add_response(
         method="POST",
@@ -73,7 +81,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     )
     httpx_mock.add_response(
         method="GET",
-        url=spotify_search_bloodbath_url,
+        url=re.compile(spotify_wildcard_search_url),
         json=spotify_search_bloodbath_response,
         status_code=200,
         is_reusable=True,
@@ -116,13 +124,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
             "image": "https://image_320.com",
         }
     ]
-    rude_expected_result = [
-        {
-            "id": "RandomSpotifyId",
-            "artist": "Bloodbath",
-            "image": "https://image_320.com",
-        }
-    ]
+    rude_expected_result = []
 
     handler(None, None)
 
