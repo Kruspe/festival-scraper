@@ -100,7 +100,7 @@ async def _retrieve_images(
                 name=artist_name,
                 genres=["Metal", "Rock", "Core", "Heavy", "MetalCore", "Thrash"],
             )
-            for artist_name in artist_names
+            for artist_name in artist_names if artist_name != ""
         ],
         max_at_once=100,
         max_per_second=5,
