@@ -11,7 +11,6 @@ from src.adapter.spotify import ArtistInformation, SpotifyClient
 logger = logging.getLogger(__name__)
 
 
-
 async def get_wacken_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> list[ArtistInformation]:
@@ -27,7 +26,7 @@ async def get_wacken_artists(
             ):
                 artist_names.append(artist["artist"]["title"])
 
-    logger.info("Wacken ArtistsL %s", artist_names)
+    logger.info("Wacken Artists %s", artist_names)
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
         github_client=github_client,
@@ -51,11 +50,11 @@ async def get_dong_artists(
                 and artist_link.get("href").startswith(
                     "https://www.dongopenair.de/band-details/?band="
                 )
-                and artist_link.text != ""
+                and artist_link.text.strip() != ""
             ):
-                artist_names.append(artist_link.text)
+                artist_names.append(artist_link.text.strip())
 
-    logger.info("DONG ArtistsL %s", artist_names)
+    logger.info("DONG Artists %s", artist_names)
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
         github_client=github_client,
@@ -90,7 +89,7 @@ async def get_rude_artists(
                     continue
                 artist_names.append(found_artist)
 
-    logger.info("RUDE ArtistsL %s", artist_names)
+    logger.info("RUDE Artists %s", artist_names)
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,
         github_client=github_client,
