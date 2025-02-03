@@ -59,21 +59,25 @@ async def get_dong_artists(
 
 
 async def get_rude_artists(
-    *, spotify_client: SpotifyClient, github_client: GitHubClient
+    *, spotify_client: SpotifyClient, github_client: GitHubClient, artists: list[str] = None
 ) -> list[ArtistInformation]:
     artist_names = []
-    response = httpx.get("https://www.rockunterdeneichen.de/bands/")
 
-    if response.status_code == 200:
-        parsed_html = BeautifulSoup(response.text, features="html.parser")
-        artist_html_list = parsed_html.find_all(
-            "div", attrs={"class": "cb-article-meta"}
-        )
-        for element in artist_html_list:
-            found_artist = element.find_next("h2").find_next("a").text.split(" (")[0]
-            if found_artist == "RUNNING ORDER 2024":
-                continue
-            artist_names.append(found_artist)
+    if artists is not None:
+        artist_names = artists
+    else:
+        response = httpx.get("https://www.rockunterdeneichen.de/bands/")
+
+        if response.status_code == 200:
+            parsed_html = BeautifulSoup(response.text, features="html.parser")
+            artist_html_list = parsed_html.find_all(
+                "div", attrs={"class": "cb-article-meta"}
+            )
+            for element in artist_html_list:
+                found_artist = element.find_next("h2").find_next("a").text.split(" (")[0]
+                if found_artist == "RUNNING ORDER 2024":
+                    continue
+                artist_names.append(found_artist)
 
     artist_information = await _retrieve_images(
         spotify_client=spotify_client,

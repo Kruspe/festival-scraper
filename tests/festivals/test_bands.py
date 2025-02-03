@@ -573,6 +573,44 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
     assert len(httpx_mock.get_requests()) == 7
     assert httpx_mock.get_requests()[2].url == rude_url
 
+@pytest.mark.asyncio
+async def test_get_rude_artists_uses_predefined_artist_names(
+    spotify_client, github_client, httpx_mock
+):
+    image_url = "https://some-image-url.com"
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Marduk&market=DE",
+        json=create_spotify_response(
+            artist_id="RandomSpotifyId", artist_name="Marduk", image_url=image_url
+        ),
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Deserted Fear&market=DE",
+        json=create_spotify_response(artist_name="Deserted Fear"),
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        json=create_spotify_response(artist_name=artist_that_has_issue),
+    )
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://api.github.com/repos/kruspe/festival-scraper/issues",
+        status_code=201,
+    )
+
+    artists = await get_rude_artists(
+        spotify_client=spotify_client, github_client=github_client, artists=["Marduk", "Deserted Fear", artist_that_has_issue]
+    )
+
+    assert artists == [
+        ArtistInformation(id="RandomSpotifyId", name="Marduk", image_url=image_url),
+    ]
+    assert len(httpx_mock.get_requests()) == 6
+
 
 @pytest.mark.asyncio
 async def test_get_rude_artists_when_call_fails(
