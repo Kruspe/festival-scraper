@@ -42,17 +42,17 @@ class SpotifyClient:
             "Boomtown Rats": ArtistInformation(
                 id="40oYPr305MsT2lsiXr9fX9",
                 name="Boomtown Rats",
-                image_url="https://i.scdn"
+                image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c"
             ),
             "Hanabie": ArtistInformation(
                 id="4N2I7VsF86h59tbsvVoB1h",
                 name="Hanabie",
-                image_url="https://i.scdn.co/image/ab6761610000e5ebde4fabc8a9d57b304c23706a",
+                image_url="https://i.scdn.co/image/ab67616100005174de4fabc8a9d57b304c23706a",
             ),
             "Kissin’ Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
                 name="Kissin' Dynamite",
-                image_url="https://i.scdn.co/image/ab6761610000e5eb650a6331f62d5671e3f8192c",
+                image_url="https://i.scdn.co/image/ab67616100005174f8e1f25d44ea876f05d70c46",
             ),
             "POWERSLAVE": ArtistInformation(
                 id="POWERSLAVE", name="POWERSLAVE", image_url=None
