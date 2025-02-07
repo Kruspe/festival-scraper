@@ -41,6 +41,12 @@ class SpotifyClient:
                 search_name="ATTIC",
                 image_url="https://i.scdn.co/image/ab67616100005174cc1a1ab23574e34fc7693f24",
             ),
+            "BAP": ArtistInformation(
+                id="39ukKqQOSUFJDAM9OLKQZg",
+                name="BAP",
+                search_name="BAP",
+                image_url="https://i.scdn.co/image/ab6761610000517494f434977e3dc06d3565a975",
+            ),
             "Boomtown Rats": ArtistInformation(
                 id="40oYPr305MsT2lsiXr9fX9",
                 name="Boomtown Rats",
