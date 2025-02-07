@@ -47,6 +47,12 @@ class SpotifyClient:
                 search_name="Boomtown Rats",
                 image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c",
             ),
+            "Eihwar": ArtistInformation(
+                id="2VFxoCJQPfQauZujESPjQK",
+                name="Eihwar",
+                search_name="Eihwar",
+                image_url="https://i.scdn.co/image/ab676161000051742a9ed2dbd3745cc93f48b51c",
+            ),
             "Guns N’ Roses": ArtistInformation(
                 id="3qm84nBOXUEQ2vnTfUTTFC",
                 name="Guns N' Roses",
@@ -65,11 +71,29 @@ class SpotifyClient:
                 search_name="Kissin’ Dynamite",
                 image_url="https://i.scdn.co/image/ab67616100005174f8e1f25d44ea876f05d70c46",
             ),
+            "Jack & Cöke": ArtistInformation(
+                id="Jack & Cöke",
+                name="Jack & Cöke",
+                search_name="Jack & Cöke",
+                image_url=None,
+            ),
+            "Metal Worx": ArtistInformation(
+                id="Metal Worx",
+                name="Metal Worx",
+                search_name="Metal Worx",
+                image_url=None,
+            ),
             "POWERSLAVE": ArtistInformation(
                 id="POWERSLAVE",
                 name="POWERSLAVE",
                 search_name="POWERSLAVE",
                 image_url=None,
+            ),
+            "Setyoursails": ArtistInformation(
+                id="01AynfThIqLCNevTuPSoYk",
+                name="SETYØURSAILS",
+                search_name="Setyoursails",
+                image_url="https://i.scdn.co/image/ab67616100005174e09b5b36b45b76f91016cfbd",
             ),
             "Tarja & Marko Hietela": ArtistInformation(
                 id="Tarja & Marko Hietela",

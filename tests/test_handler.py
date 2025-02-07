@@ -126,7 +126,18 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
             "image": "https://image_320.com",
         }
     ]
-    rude_expected_result = []
+    rude_expected_result = [
+        {
+            "id": "Jack & Cöke",
+            "artist": "Jack & Cöke",
+            "image": None,
+        },
+        {
+            "id": "Metal Worx",
+            "artist": "Metal Worx",
+            "image": None,
+        },
+    ]
 
     handler(None, None)
 
