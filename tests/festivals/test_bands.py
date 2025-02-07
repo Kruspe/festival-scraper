@@ -99,7 +99,7 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
 
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
         ),
@@ -107,13 +107,13 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Vader&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Vader&market=DE",
         json=create_spotify_response(artist_name="Vader"),
         status_code=200,
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_issue),
         status_code=200,
     )
@@ -168,7 +168,7 @@ async def test_get_wacken_artists_closes_opened_issues(
 
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId",
             artist_name=artist_that_has_issue,
@@ -389,19 +389,19 @@ async def test_get_dong_artists(spotify_client, github_client, httpx_mock):
     httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
         ),
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Dawn of Disease&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Dawn of Disease&market=DE",
         json=create_spotify_response(artist_name="Dawn of Disease"),
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_issue),
     )
 
@@ -440,7 +440,7 @@ async def test_get_dong_artists_does_not_return_when_no_a_element_appears(
     httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Bloodbath", image_url=image_url
         ),
@@ -483,7 +483,7 @@ async def test_get_dong_artists_closes_opened_issues(
     httpx_mock.add_response(method="GET", url=dong_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId",
             artist_name=artist_that_has_issue,
@@ -542,19 +542,19 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
     httpx_mock.add_response(method="GET", url=rude_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Marduk&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Marduk&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Marduk", image_url=image_url
         ),
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Deserted Fear&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Deserted Fear&market=DE",
         json=create_spotify_response(artist_name="Deserted Fear"),
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_issue),
     )
 
@@ -582,19 +582,19 @@ async def test_get_rude_artists_uses_predefined_artist_names(
     image_url = "https://some-image-url.com"
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Marduk&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Marduk&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId", artist_name="Marduk", image_url=image_url
         ),
     )
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Deserted Fear&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Deserted Fear&market=DE",
         json=create_spotify_response(artist_name="Deserted Fear"),
     )
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(artist_name=artist_that_has_issue),
     )
 
@@ -648,7 +648,7 @@ async def test_get_rude_artists_closes_opened_issues(
     httpx_mock.add_response(method="GET", url=rude_url, text=html_response)
     httpx_mock.add_response(
         method="GET",
-        url=f"https://api.spotify.com/v1/search?type=artist&limit=5&q={artist_that_has_issue}&market=DE",
+        url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId",
             artist_name=artist_that_has_issue,

@@ -101,7 +101,7 @@ async def test_search_artist_calls_correct_endpoint(spotify_client, httpx_mock):
     authorization_header_key = "Authorization"
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -137,7 +137,7 @@ async def test_search_artist_raises_and_logs_exception_when_search_fails(
     error_message = {"error": "error"}
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json=error_message,
         status_code=500,
     )
@@ -161,7 +161,7 @@ async def test_search_artist_returns_artist_information(spotify_client, httpx_mo
     artist_id = "RandomSpotifyId"
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -197,7 +197,7 @@ async def test_search_artist_returns_no_image_url_when_name_does_not_match_exact
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -233,7 +233,7 @@ async def test_search_artist_returns_no_image_url_when_no_artists_are_found(
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [],
@@ -256,7 +256,7 @@ async def test_search_artist_returns_no_image_url_when_genre_does_not_match(
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -292,7 +292,7 @@ async def test_search_artist_returns_no_image_url_when_no_images_are_found(
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -322,7 +322,7 @@ async def test_search_artist_returns_first_match_when_more_are_available(
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -382,7 +382,7 @@ async def test_search_artist_returns_no_image_url_when_available_images_are_to_s
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -418,7 +418,7 @@ async def test_search_artist_returns_smallest_possible_image_bigger_than_300_wid
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [
@@ -464,7 +464,7 @@ async def test_search_artist_returns_matching_artist_if_one_genre_matches(
 ):
     httpx_mock.add_response(
         method="GET",
-        url="https://api.spotify.com/v1/search?type=artist&limit=5&q=Bloodbath&market=DE",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
         json={
             "artists": {
                 "items": [

@@ -42,7 +42,12 @@ class SpotifyClient:
             "Boomtown Rats": ArtistInformation(
                 id="40oYPr305MsT2lsiXr9fX9",
                 name="Boomtown Rats",
-                image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c"
+                image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c",
+            ),
+            "Guns N’ Roses": ArtistInformation(
+                id="3qm84nBOXUEQ2vnTfUTTFC",
+                name="Guns N' Roses",
+                image_url="https://i.scdn.co/image/ab6761610000517450defaf9fc059a1efc541f4c",
             ),
             "Hanabie": ArtistInformation(
                 id="4N2I7VsF86h59tbsvVoB1h",
@@ -101,7 +106,7 @@ class SpotifyClient:
             return self.exception_map[name]
         search_response = await self.client.get(
             "https://api.spotify.com/v1/search",
-            params={"type": "artist", "limit": 5, "q": name, "market": "DE"},
+            params={"type": "artist", "q": name, "market": "DE"},
             headers={"Authorization": "Bearer " + self.token},
         )
         search_response_status_code = search_response.status_code

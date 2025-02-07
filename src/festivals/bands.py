@@ -109,7 +109,15 @@ async def _retrieve_images(
             functools.partial(
                 spotify_client.search_artist,
                 name=artist_name,
-                genres=["Metal", "Rock", "Core", "Heavy", "MetalCore", "Thrash", "Punk"],
+                genres=[
+                    "Metal",
+                    "Rock",
+                    "Core",
+                    "Heavy",
+                    "MetalCore",
+                    "Thrash",
+                    "Punk",
+                ],
             )
             for artist_name in artist_names
             if artist_name != ""
