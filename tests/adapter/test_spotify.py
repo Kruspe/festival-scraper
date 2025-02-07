@@ -187,7 +187,10 @@ async def test_search_artist_returns_artist_information(spotify_client, httpx_mo
         name=artist_name, genres=["metal"]
     )
     assert artist_information == ArtistInformation(
-        id=artist_id, name=artist_name, image_url=expected_bloodbath_image_url
+        id=artist_id,
+        name=artist_name,
+        search_name=artist_name,
+        image_url=expected_bloodbath_image_url,
     )
 
 
@@ -223,7 +226,7 @@ async def test_search_artist_returns_no_image_url_when_name_does_not_match_exact
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id=None, name="Bloodbath", image_url=None
+        id=None, name="Bloodbath", search_name="Bloodbath", image_url=None
     )
 
 
@@ -246,7 +249,7 @@ async def test_search_artist_returns_no_image_url_when_no_artists_are_found(
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id=None, name="Bloodbath", image_url=None
+        id=None, name="Bloodbath", search_name="Bloodbath", image_url=None
     )
 
 
@@ -282,7 +285,7 @@ async def test_search_artist_returns_no_image_url_when_genre_does_not_match(
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id=None, name="Bloodbath", image_url=None
+        id=None, name="Bloodbath", search_name="Bloodbath", image_url=None
     )
 
 
@@ -312,7 +315,7 @@ async def test_search_artist_returns_no_image_url_when_no_images_are_found(
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id=None, name="Bloodbath", image_url=None
+        id=None, name="Bloodbath", search_name="Bloodbath", image_url=None
     )
 
 
@@ -372,7 +375,10 @@ async def test_search_artist_returns_first_match_when_more_are_available(
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id="CorrectSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="CorrectSpotifyId",
+        name="Bloodbath",
+        search_name="Bloodbath",
+        image_url=expected_bloodbath_image_url,
     )
 
 
@@ -408,7 +414,7 @@ async def test_search_artist_returns_no_image_url_when_available_images_are_to_s
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id=None, name="Bloodbath", image_url=None
+        id=None, name="Bloodbath", search_name="Bloodbath", image_url=None
     )
 
 
@@ -454,7 +460,10 @@ async def test_search_artist_returns_smallest_possible_image_bigger_than_300_wid
         name="Bloodbath", genres=["Metal"]
     )
     assert artist_information == ArtistInformation(
-        id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="RandomSpotifyId",
+        name="Bloodbath",
+        search_name="Bloodbath",
+        image_url=expected_bloodbath_image_url,
     )
 
 
@@ -490,7 +499,10 @@ async def test_search_artist_returns_matching_artist_if_one_genre_matches(
         name="Bloodbath", genres=["NonExistingGenre", "Metal"]
     )
     assert artist_information == ArtistInformation(
-        id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="RandomSpotifyId",
+        name="Bloodbath",
+        search_name="Bloodbath",
+        image_url=expected_bloodbath_image_url,
     )
 
 
@@ -499,7 +511,10 @@ async def test_search_artist_returns_artists_from_exception_map(
     spotify_client, httpx_mock
 ):
     expected_artist_information = ArtistInformation(
-        id="RandomSpotifyId", name="Bloodbath", image_url=expected_bloodbath_image_url
+        id="RandomSpotifyId",
+        name="Bloodbath",
+        search_name="Bloodbath",
+        image_url=expected_bloodbath_image_url,
     )
     spotify_client.exception_map = {"Bloodbath": expected_artist_information}
     artist_information = await spotify_client.search_artist(

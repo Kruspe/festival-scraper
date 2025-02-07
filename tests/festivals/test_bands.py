@@ -12,6 +12,7 @@ wacken_url = "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
 dong_url = "https://www.dongopenair.de/bands/"
 rude_url = "https://www.rockunterdeneichen.de/bands/"
 artist_that_has_issue = "hypocrisy"
+artist_that_has_issue_spotify_name = "Hypocrisy"
 
 
 @pytest.fixture
@@ -94,7 +95,12 @@ async def test_get_wacken_artists(spotify_client, github_client, httpx_mock):
 
     image_url = "https://some-image-url.com"
     expected_result = [
-        ArtistInformation(id="RandomSpotifyId", name="Bloodbath", image_url=image_url)
+        ArtistInformation(
+            id="RandomSpotifyId",
+            name="Bloodbath",
+            search_name="Bloodbath",
+            image_url=image_url,
+        )
     ]
 
     httpx_mock.add_response(
@@ -162,7 +168,10 @@ async def test_get_wacken_artists_closes_opened_issues(
     image_url = "https://some-image-url.com"
     expected_result = [
         ArtistInformation(
-            id="RandomSpotifyId", name=artist_that_has_issue, image_url=image_url
+            id="RandomSpotifyId",
+            name=artist_that_has_issue_spotify_name,
+            search_name=artist_that_has_issue,
+            image_url=image_url,
         )
     ]
 
@@ -171,7 +180,7 @@ async def test_get_wacken_artists_closes_opened_issues(
         url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId",
-            artist_name=artist_that_has_issue,
+            artist_name=artist_that_has_issue_spotify_name,
             image_url=image_url,
         ),
         status_code=200,
@@ -416,7 +425,12 @@ async def test_get_dong_artists(spotify_client, github_client, httpx_mock):
     )
 
     assert artists == [
-        ArtistInformation(id="RandomSpotifyId", name="Bloodbath", image_url=image_url),
+        ArtistInformation(
+            id="RandomSpotifyId",
+            name="Bloodbath",
+            search_name="Bloodbath",
+            image_url=image_url,
+        ),
     ]
     assert len(httpx_mock.get_requests()) == 7
     assert httpx_mock.get_requests()[2].url == dong_url
@@ -450,7 +464,12 @@ async def test_get_dong_artists_does_not_return_when_no_a_element_appears(
     )
 
     assert artists == [
-        ArtistInformation(id="RandomSpotifyId", name="Bloodbath", image_url=image_url)
+        ArtistInformation(
+            id="RandomSpotifyId",
+            name="Bloodbath",
+            search_name="Bloodbath",
+            image_url=image_url,
+        )
     ]
 
 
@@ -486,7 +505,7 @@ async def test_get_dong_artists_closes_opened_issues(
         url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId",
-            artist_name=artist_that_has_issue,
+            artist_name=artist_that_has_issue_spotify_name,
             image_url=image_url,
         ),
     )
@@ -503,7 +522,10 @@ async def test_get_dong_artists_closes_opened_issues(
 
     assert artists == [
         ArtistInformation(
-            id="RandomSpotifyId", name=artist_that_has_issue, image_url=image_url
+            id="RandomSpotifyId",
+            name=artist_that_has_issue_spotify_name,
+            search_name=artist_that_has_issue,
+            image_url=image_url,
         ),
     ]
     assert len(httpx_mock.get_requests()) == 5
@@ -569,7 +591,12 @@ async def test_get_rude_artists(spotify_client, github_client, httpx_mock):
     )
 
     assert artists == [
-        ArtistInformation(id="RandomSpotifyId", name="Marduk", image_url=image_url),
+        ArtistInformation(
+            id="RandomSpotifyId",
+            name="Marduk",
+            search_name="Marduk",
+            image_url=image_url,
+        ),
     ]
     assert len(httpx_mock.get_requests()) == 7
     assert httpx_mock.get_requests()[2].url == rude_url
@@ -611,7 +638,12 @@ async def test_get_rude_artists_uses_predefined_artist_names(
     )
 
     assert artists == [
-        ArtistInformation(id="RandomSpotifyId", name="Marduk", image_url=image_url),
+        ArtistInformation(
+            id="RandomSpotifyId",
+            name="Marduk",
+            search_name="Marduk",
+            image_url=image_url,
+        ),
     ]
     assert len(httpx_mock.get_requests()) == 6
 
@@ -651,7 +683,7 @@ async def test_get_rude_artists_closes_opened_issues(
         url=f"https://api.spotify.com/v1/search?type=artist&q={artist_that_has_issue}&market=DE",
         json=create_spotify_response(
             artist_id="RandomSpotifyId",
-            artist_name=artist_that_has_issue,
+            artist_name=artist_that_has_issue_spotify_name,
             image_url=image_url,
         ),
     )
@@ -668,7 +700,10 @@ async def test_get_rude_artists_closes_opened_issues(
 
     assert artists == [
         ArtistInformation(
-            id="RandomSpotifyId", name=artist_that_has_issue, image_url=image_url
+            id="RandomSpotifyId",
+            name=artist_that_has_issue_spotify_name,
+            search_name=artist_that_has_issue,
+            image_url=image_url,
         ),
     ]
     assert len(httpx_mock.get_requests()) == 5

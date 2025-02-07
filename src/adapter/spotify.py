@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class ArtistInformation:
     id: str | None
     name: str
+    search_name: str
     image_url: str | None
 
 
@@ -37,39 +38,49 @@ class SpotifyClient:
             "ATTIC": ArtistInformation(
                 id="5z9ci33r73qjiOqk1wmuY9",
                 name="Attic",
+                search_name="ATTIC",
                 image_url="https://i.scdn.co/image/ab67616100005174cc1a1ab23574e34fc7693f24",
             ),
             "Boomtown Rats": ArtistInformation(
                 id="40oYPr305MsT2lsiXr9fX9",
                 name="Boomtown Rats",
+                search_name="Boomtown Rats",
                 image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c",
             ),
             "Guns N’ Roses": ArtistInformation(
                 id="3qm84nBOXUEQ2vnTfUTTFC",
                 name="Guns N' Roses",
+                search_name="Guns N’ Roses",
                 image_url="https://i.scdn.co/image/ab6761610000517450defaf9fc059a1efc541f4c",
             ),
             "Hanabie": ArtistInformation(
                 id="4N2I7VsF86h59tbsvVoB1h",
                 name="Hanabie",
+                search_name="Hanabie",
                 image_url="https://i.scdn.co/image/ab67616100005174de4fabc8a9d57b304c23706a",
             ),
             "Kissin’ Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
                 name="Kissin' Dynamite",
+                search_name="Kissin’ Dynamite",
                 image_url="https://i.scdn.co/image/ab67616100005174f8e1f25d44ea876f05d70c46",
             ),
             "POWERSLAVE": ArtistInformation(
-                id="POWERSLAVE", name="POWERSLAVE", image_url=None
+                id="POWERSLAVE",
+                name="POWERSLAVE",
+                search_name="POWERSLAVE",
+                image_url=None,
             ),
             "Tarja & Marko Hietela": ArtistInformation(
                 id="Tarja & Marko Hietela",
                 name="Tarja & Marko Hietela",
+                search_name="Tarja & Marko Hietela",
                 image_url=None,
             ),
             "Weckörhead": ArtistInformation(
                 id="44pq4JEhpX9dg5BbZlJGZg",
                 name="Weckörhead",
+                search_name="Weckörhead",
                 image_url=None,
             ),
         }
@@ -125,7 +136,9 @@ class SpotifyClient:
             logger.error(
                 f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
             )
-            return ArtistInformation(id=None, name=name, image_url=None)
+            return ArtistInformation(
+                id=None, name=name, search_name=name, image_url=None
+            )
 
         best_matches = []
         for artist in found_artists:
@@ -144,7 +157,9 @@ class SpotifyClient:
             logger.error(
                 f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
             )
-            return ArtistInformation(id=None, name=name, image_url=None)
+            return ArtistInformation(
+                id=None, name=name, search_name=name, image_url=None
+            )
 
         matching_information: list[ArtistInformation] = []
         for match in best_matches:
@@ -155,6 +170,7 @@ class SpotifyClient:
                             ArtistInformation(
                                 id=match["id"],
                                 name=match["name"],
+                                search_name=name,
                                 image_url=image["url"],
                             )
                         )
@@ -164,11 +180,14 @@ class SpotifyClient:
             logger.error(
                 f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
             )
-            return ArtistInformation(id=None, name=name, image_url=None)
+            return ArtistInformation(
+                id=None, name=name, search_name=name, image_url=None
+            )
 
         return ArtistInformation(
             id=matching_information[0].id,
             name=matching_information[0].name,
+            search_name=name,
             image_url=matching_information[0].image_url,
         )
 
