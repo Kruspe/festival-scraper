@@ -89,6 +89,12 @@ class SpotifyClient:
                 search_name="Metal Worx",
                 image_url=None,
             ),
+            "Pentagram (Chile)": ArtistInformation(
+                id="0xin7cSeEjVSsvNsKPHaJc",
+                name="Pentagram Chile",
+                search_name="Pentagram (Chile)",
+                image_url="https://i.scdn.co/image/ab67616100005174f662e3011e3f5487dccb6227"
+            ),
             "POWERSLAVE": ArtistInformation(
                 id="POWERSLAVE",
                 name="POWERSLAVE",
