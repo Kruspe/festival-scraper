@@ -1,5 +1,6 @@
 import functools
 import logging
+import re
 
 import aiometer
 import httpx
@@ -49,7 +50,7 @@ async def get_dong_artists(
                 artist_link.get("href") is not None
                 and artist_link.get("href").startswith(
                     "https://www.dongopenair.de/band-details/?band="
-                )
+                ) and not re.match("^\d\d:\d\d", artist_link.text.strip())
                 and artist_link.text.strip() != ""
             ):
                 artist_names.append(artist_link.text.strip())
