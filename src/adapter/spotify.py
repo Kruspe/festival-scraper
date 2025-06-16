@@ -113,6 +113,12 @@ class SpotifyClient:
                 search_name="Tarja & Marko Hietela",
                 image_url=None,
             ),
+            "UK Subs": ArtistInformation(
+                id="4wsg78KGu80m8Xk37PY2uG",
+                name="U.K. Subs",
+                search_name="UK Subs",
+                image_url="https://i.scdn.co/image/ab67616100005174cb869ec7836df71825714e48",
+            ),
             "Weckörhead": ArtistInformation(
                 id="44pq4JEhpX9dg5BbZlJGZg",
                 name="Weckörhead",
