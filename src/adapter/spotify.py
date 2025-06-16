@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from base64 import b64encode
@@ -93,7 +94,7 @@ class SpotifyClient:
                 id="0xin7cSeEjVSsvNsKPHaJc",
                 name="Pentagram Chile",
                 search_name="Pentagram (Chile)",
-                image_url="https://i.scdn.co/image/ab67616100005174f662e3011e3f5487dccb6227"
+                image_url="https://i.scdn.co/image/ab67616100005174f662e3011e3f5487dccb6227",
             ),
             "POWERSLAVE": ArtistInformation(
                 id="POWERSLAVE",
@@ -220,8 +221,13 @@ class SpotifyClient:
 
         if len(matching_information) == 0:
             logger.error(
-                f"Unable to find information for {name}! Here are the spotify search results: {search_response_json}"
+                f"Unable to find information for '{name}'! Here are the interesting parts of the search result"
             )
+            loaded_json = json.loads(search_response_json)
+            for item in loaded_json["items"]:
+                logger.error(
+                    f"SpotifyName {item['name']}, Id: {item['id']}, Genres: {item['genres']}', Image URL: {item['images']}"
+                )
             return ArtistInformation(
                 id=None, name=name, search_name=name, image_url=None
             )
