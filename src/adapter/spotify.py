@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 from base64 import b64encode
@@ -223,8 +222,7 @@ class SpotifyClient:
             logger.error(
                 f"Unable to find information for '{name}'! Here are the interesting parts of the search result"
             )
-            loaded_json = json.loads(search_response_json)
-            for item in loaded_json["items"]:
+            for item in search_response_json["artists"]["items"]:
                 logger.error(
                     f"SpotifyName {item['name']}, Id: {item['id']}, Genres: {item['genres']}', Image URL: {item['images']}"
                 )
