@@ -119,6 +119,7 @@ async def _retrieve_images(
                     "MetalCore",
                     "Thrash",
                     "Punk",
+                    "Medieval",
                 ],
             )
             for artist_name in artist_names

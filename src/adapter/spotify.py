@@ -53,11 +53,29 @@ class SpotifyClient:
                 search_name="Boomtown Rats",
                 image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c",
             ),
+            "Crash Pilots": ArtistInformation(
+                id="5VoFoAH0rAYed9CFNOzG1g",
+                name="CrashPilots",
+                search_name="Crash Pilots",
+                image_url="https://i.scdn.co/image/ab6761610000517496ee7706305a7857146a246e",
+            ),
             "Eihwar": ArtistInformation(
                 id="2VFxoCJQPfQauZujESPjQK",
                 name="Eihwar",
                 search_name="Eihwar",
                 image_url="https://i.scdn.co/image/ab676161000051742a9ed2dbd3745cc93f48b51c",
+            ),
+            "Elnuevonce": ArtistInformation(
+                id="3Sg4d4kPgf4zotCAq4kEIz",
+                name="ELNUEVEONCE",
+                search_name="Elnuevonce",
+                image_url="https://i.scdn.co/image/ab6761610000517491c68e74542bf9ade02ab911",
+            ),
+            "Gaddavir": ArtistInformation(
+                id="6cYLMbzgUmWJ8Zl9yCaQY5",
+                name="Gaddavír",
+                search_name="Gaddavir",
+                image_url="https://i.scdn.co/image/ab67616d00001e026a59793b20de6874c98cdbbd",
             ),
             "Guns N’ Roses": ArtistInformation(
                 id="3qm84nBOXUEQ2vnTfUTTFC",
@@ -71,11 +89,23 @@ class SpotifyClient:
                 search_name="Hanabie",
                 image_url="https://i.scdn.co/image/ab67616100005174de4fabc8a9d57b304c23706a",
             ),
+            "In The Woods": ArtistInformation(
+                id="41E3QF87uVy2sVvX2TobhI",
+                name="In The Woods...",
+                search_name="In The Woods",
+                image_url="https://i.scdn.co/image/ab676161000051745c7a2aea316d9b73e787304d",
+            ),
             "Kissin’ Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
                 name="Kissin' Dynamite",
                 search_name="Kissin’ Dynamite",
                 image_url="https://i.scdn.co/image/ab67616100005174f8e1f25d44ea876f05d70c46",
+            ),
+            "Livlos": ArtistInformation(
+                id="3upLnjEfkXlcb8IddTLQUA",
+                name="LIVLØS",
+                search_name="Livlos",
+                image_url="https://i.scdn.co/image/ab6761610000517461411d39214e7f90fda46c1a",
             ),
             "Jack & Cöke": ArtistInformation(
                 id="Jack & Cöke",
@@ -113,11 +143,23 @@ class SpotifyClient:
                 search_name="Tarja & Marko Hietela",
                 image_url=None,
             ),
+            "Torsten Sträter": ArtistInformation(
+                id="3Q1JqFy5L609CKH4cUjCCF",
+                name="Torsten Sträter",
+                search_name="Torsten Sträter",
+                image_url="https://i.scdn.co/image/70534390372bf6ab7eddaf9a5a8d88af70aa4fc7",
+            ),
             "UK Subs": ArtistInformation(
                 id="4wsg78KGu80m8Xk37PY2uG",
                 name="U.K. Subs",
                 search_name="UK Subs",
                 image_url="https://i.scdn.co/image/ab67616100005174cb869ec7836df71825714e48",
+            ),
+            "Wacken Firefighters": ArtistInformation(
+                id="Wacken Firefighters",
+                name="Wacken Firefighters",
+                search_name="Wacken Firefighters",
+                image_url=None,
             ),
             "Weckörhead": ArtistInformation(
                 id="44pq4JEhpX9dg5BbZlJGZg",
@@ -225,15 +267,14 @@ class SpotifyClient:
             image_url=matching_information[0].image_url,
         )
 
-    def _handle_not_found_artist(
-        self, *, name: str, spotify_response
-    ) -> ArtistInformation:
+    @staticmethod
+    def _handle_not_found_artist(*, name: str, spotify_response) -> ArtistInformation:
         logger.error(
             f"Unable to find information for '{name}'! Here are the interesting parts of the search result"
         )
         for item in spotify_response["artists"]["items"]:
             logger.error(
-                f"SpotifyName {item['name']}, Id: {item['id']}, Genres: {item['genres']}', Image URL: {item['images']}"
+                f"SpotifyName '{item['name']}', Id: '{item['id']}', Genres: {item['genres']}', Image URL: {item['images']}"
             )
         return ArtistInformation(id=None, name=name, search_name=name, image_url=None)
 
