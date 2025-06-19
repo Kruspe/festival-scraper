@@ -4,14 +4,14 @@ requires-python = ">=3.12.4"
 
 [[package]]
 name = "aiometer"
-version = "0.5.0"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/94/2aed63a1f34116be83cb07f7d5f74f9d85cf06a920076a94307ba2ba385a/aiometer-0.5.0.tar.gz", hash = "sha256:1d441ad3c16eaa56d438e5f9a2f9fbccdb29f6140fb36f9cb68183545ec48691", size = 18256, upload-time = "2023-12-11T19:51:58.294Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/cf/9d81b707241b7fb6e8f6bd896cd43d1d93f9e126b5577d962de490bac644/aiometer-1.0.0.tar.gz", hash = "sha256:c492933dbd3a90c619473c3f242d00842ee274f6285a44b5d5fbee228a407056", size = 18427, upload-time = "2025-04-04T09:26:25.634Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/48/bfed7b1373890a7946cd7523c125e6469a7add944712cb328be190032b0e/aiometer-0.5.0-py3-none-any.whl", hash = "sha256:57e54a067e6918504844610da23aabf6e179cb0f01104503b3db4bfb39f5e1f2", size = 12316, upload-time = "2023-12-11T19:51:57.059Z" },
+    { url = "https://files.pythonhosted.org/packages/40/0b/b8cd78305e788a9837c41c75183a1085df3c4e5d5758681fb623c33d5848/aiometer-1.0.0-py3-none-any.whl", hash = "sha256:a733315788ff9b474a924de865f9ecee2c29b8f5f9ac26db7660976affa6bf2e", size = 12436, upload-time = "2025-04-04T09:26:24.184Z" },
 ]
 
 [[package]]
