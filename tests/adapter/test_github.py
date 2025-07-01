@@ -1,4 +1,3 @@
-import json
 from typing import Union
 from unittest.mock import Mock, create_autospec
 
@@ -103,13 +102,11 @@ def test_create_issue_calls_correct_endpoint(github_client, httpx_mock):
         method="POST",
         url="https://api.github.com/repos/kruspe/festival-scraper/issues",
         status_code=201,
-        match_content=json.dumps(
-            {
-                "title": f"Search for ArtistInformation manually: {artist_name}",
-                "body": f"Could not find ArtistInformation for {artist_name}. Please look them up manually.",
-                "assignees": ["kruspe"],
-            }
-        ).encode("utf-8"),
+        match_json={
+            "title": f"Search for ArtistInformation manually: {artist_name}",
+            "body": f"Could not find ArtistInformation for {artist_name}. Please look them up manually.",
+            "assignees": ["kruspe"],
+        },
         match_headers={
             "Authorization": "Bearer gh_pr_token",
             "X-GitHub-Api-Version": "2022-11-28",
@@ -158,9 +155,7 @@ def test_close_issue_calls_correct_endpoint(github_client, httpx_mock):
         method="PATCH",
         url=f"https://api.github.com/repos/kruspe/festival-scraper/issues/{pre_existing_issue_number}",
         status_code=200,
-        match_content=json.dumps(
-            {"state": "closed", "state_reason": "completed"}
-        ).encode("utf-8"),
+        match_json={"state": "closed", "state_reason": "completed"},
         match_headers={
             "Authorization": "Bearer gh_pr_token",
             "X-GitHub-Api-Version": "2022-11-28",
