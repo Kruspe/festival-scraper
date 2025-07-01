@@ -173,7 +173,7 @@ class SpotifyClient:
         encoded_credentials = b64encode(
             f"{self.client_id}:{self.client_secret}".encode()
         )
-        encoded_spotify_basic_auth = f"Basic {encoded_credentials.decode("utf-8")}"
+        encoded_spotify_basic_auth = f"Basic {encoded_credentials.decode('utf-8')}"
         spotify_token_response = httpx.post(
             "https://accounts.spotify.com/api/token",
             data="grant_type=client_credentials",

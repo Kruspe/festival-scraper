@@ -42,7 +42,7 @@ def spotify_client(spotify_envs, ssm_mock, httpx_mock):
 async def test_spotify_client_retrieves_token(spotify_envs, ssm_mock, httpx_mock):
     authorization_header_key = "Authorization"
     authorization_header_value = (
-        f"Basic {b64encode(b"client_id:client_secret").decode('utf-8')}"
+        f"Basic {b64encode(b'client_id:client_secret').decode('utf-8')}"
     )
     content_type_header_key = "Content-Type"
     content_type_header_value = "application/x-www-form-urlencoded"
