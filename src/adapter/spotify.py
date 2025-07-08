@@ -35,6 +35,18 @@ class SpotifyClient:
         self.token = self._get_token()
         self.client = httpx.AsyncClient()
         self.exception_map = {
+            "Acoustic Guerillas": ArtistInformation(
+                id="Acoustic Guerillas",
+                name="Acoustic Guerillas",
+                search_name="Acoustic Guerillas",
+                image_url=None,
+            ),
+            "Alien Rockin Explosion": ArtistInformation(
+                id="2GgqtN4rfpLZosbLI3PnpP",
+                name="Alien Rockin' Explosion",
+                search_name="Alien Rockin Explosion",
+                image_url="https://i.scdn.co/image/ab6761610000517478db6c81f13e630f11fe577d",
+            ),
             "ATTIC": ArtistInformation(
                 id="5z9ci33r73qjiOqk1wmuY9",
                 name="Attic",
@@ -101,6 +113,12 @@ class SpotifyClient:
                 search_name="In The Woods",
                 image_url="https://i.scdn.co/image/ab676161000051745c7a2aea316d9b73e787304d",
             ),
+            "Just for Priest": ArtistInformation(
+                id="Just for Priest",
+                name="Just for Priest",
+                search_name="Just for Priest",
+                image_url=None,
+            ),
             "Kissin’ Dynamite": ArtistInformation(
                 id="2wSP2cFfkqg4LKu1pmkTWx",
                 name="Kissin' Dynamite",
@@ -117,6 +135,12 @@ class SpotifyClient:
                 id="Jack & Cöke",
                 name="Jack & Cöke",
                 search_name="Jack & Cöke",
+                image_url=None,
+            ),
+            "Ozzyfied": ArtistInformation(
+                id="Ozzyfied",
+                name="Ozzyfied",
+                search_name="Ozzyfied",
                 image_url=None,
             ),
             "Metal Worx": ArtistInformation(
@@ -143,11 +167,23 @@ class SpotifyClient:
                 search_name="Setyoursails",
                 image_url="https://i.scdn.co/image/ab67616100005174e09b5b36b45b76f91016cfbd",
             ),
+            "SLAYEnsemble": ArtistInformation(
+                id="SLAYEnsemble",
+                name="SLAYEnsemble",
+                search_name="SLAYEnsemble",
+                image_url=None,
+            ),
             "Tarja & Marko Hietela": ArtistInformation(
                 id="Tarja & Marko Hietela",
                 name="Tarja & Marko Hietela",
                 search_name="Tarja & Marko Hietela",
                 image_url=None,
+            ),
+            "Timsen": ArtistInformation(
+                id="7qcelJ9rfFFiTeXbPcbAOo",
+                name="Timsen",
+                search_name="Timsen",
+                image_url="https://i.scdn.co/image/ab67616100005174b23eab56e28a19b66b10154d",
             ),
             "Torsten Sträter": ArtistInformation(
                 id="3Q1JqFy5L609CKH4cUjCCF",
