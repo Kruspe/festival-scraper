@@ -59,6 +59,12 @@ class SpotifyClient:
                 search_name="Crash Pilots",
                 image_url="https://i.scdn.co/image/ab6761610000517496ee7706305a7857146a246e",
             ),
+            "Deadline": ArtistInformation(
+                id="5tjxNnmJbxnP9pOaDUrePN",
+                name="Deadline",
+                search_name="Deadline",
+                image_url="https://i.scdn.co/image/ab67616100005174c90af523235ff553cc1484be",
+            ),
             "Eihwar": ArtistInformation(
                 id="2VFxoCJQPfQauZujESPjQK",
                 name="Eihwar",
