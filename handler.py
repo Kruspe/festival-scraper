@@ -51,6 +51,7 @@ async def _handle(
                     "V8 Wankers",
                     "Chaos and Confusion",
                     "Iron Priest",
+                    "Non Est Deus"
                 ],
             )
         )
