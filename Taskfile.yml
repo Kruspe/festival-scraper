@@ -19,7 +19,8 @@ tasks:
     desc: Build and zip everything for a lambda deployment
     cmds:
       - rm -rf dist
-      - uv pip install --target ./dist -r pyproject.toml
+      - uv export --frozen --no-dev --no-editable -o requirements.txt
+      - uv pip install --target ./dist -r requirements.txt
       - task: zip
       - zip -r dist/festival-scraper.zip src
       - zip -r dist/festival-scraper.zip handler.py

@@ -12,3 +12,6 @@ wheels/
 .DS_Store
 .idea
 *.iml
+
+# Build files
+requirements.txt
