@@ -302,7 +302,7 @@ class SpotifyClient:
 
         best_matches = []
         for artist in found_artists:
-            if artist["name"].lower() != name.lower():
+            if artist["name"].lower().strip() != name.lower():
                 continue
             if len(artist["genres"]) > 0:
                 for genre in genres:
@@ -340,7 +340,7 @@ class SpotifyClient:
 
         return ArtistInformation(
             id=matching_information[0].id,
-            name=matching_information[0].name,
+            name=matching_information[0].name.strip(),
             search_name=name,
             image_url=matching_information[0].image_url,
         )

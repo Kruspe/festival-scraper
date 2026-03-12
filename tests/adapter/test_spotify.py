@@ -507,6 +507,45 @@ async def test_search_artist_returns_matching_artist_if_one_genre_matches(
 
 
 @pytest.mark.asyncio
+async def test_search_artist_returns_matching_artist_if_spotify_returns_additional_whitespaces(
+    spotify_client, httpx_mock
+):
+    httpx_mock.add_response(
+        method="GET",
+        url="https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE",
+        json={
+            "artists": {
+                "items": [
+                    {
+                        "id": "RandomSpotifyId",
+                        "genres": ["Heavy Rock", "Swedish Death", "Death Metal"],
+                        "images": [
+                            {
+                                "height": 320,
+                                "url": expected_bloodbath_image_url,
+                                "width": 320,
+                            },
+                        ],
+                        "name": " Bloodbath ",
+                    },
+                ],
+            }
+        },
+        status_code=200,
+    )
+
+    artist_information = await spotify_client.search_artist(
+        name="Bloodbath", genres=["NonExistingGenre", "Metal"]
+    )
+    assert artist_information == ArtistInformation(
+        id="RandomSpotifyId",
+        name="Bloodbath",
+        search_name="Bloodbath",
+        image_url=expected_bloodbath_image_url,
+    )
+
+
+@pytest.mark.asyncio
 async def test_search_artist_returns_artists_from_exception_map(
     spotify_client, httpx_mock
 ):
