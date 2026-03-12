@@ -65,11 +65,23 @@ class SpotifyClient:
                 search_name="BAP",
                 image_url="https://i.scdn.co/image/ab6761610000517494f434977e3dc06d3565a975",
             ),
+            "Blood Fire Death": ArtistInformation(
+                id="Blood Fire Death",
+                name="Blood Fire Death",
+                search_name="Blood Fire Death",
+                image_url=None,
+            ),
             "Boomtown Rats": ArtistInformation(
                 id="40oYPr305MsT2lsiXr9fX9",
                 name="Boomtown Rats",
                 search_name="Boomtown Rats",
                 image_url="https://i.scdn.co/image/ab67616100005174650a6331f62d5671e3f8192c",
+            ),
+            "Chaos and Confusion": ArtistInformation(
+                id="Chaos and Confusion",
+                name="Chaos and Confusion",
+                search_name="Chaos and Confusion",
+                image_url=None,
             ),
             "Crash Pilots": ArtistInformation(
                 id="5VoFoAH0rAYed9CFNOzG1g",
@@ -82,6 +94,12 @@ class SpotifyClient:
                 name="Deadline",
                 search_name="Deadline",
                 image_url="https://i.scdn.co/image/ab67616100005174c90af523235ff553cc1484be",
+            ),
+            'Dieter "Maschine" Birr': ArtistInformation(
+                id='Dieter "Maschine" Birr',
+                name='Dieter "Maschine" Birr',
+                search_name='Dieter "Maschine" Birr',
+                image_url=None,
             ),
             "Eihwar": ArtistInformation(
                 id="2VFxoCJQPfQauZujESPjQK",
@@ -98,8 +116,8 @@ class SpotifyClient:
             "Evil Jared & Krogi": ArtistInformation(
                 id="766CPWJo4muxhGzhTmI8dv",
                 name="EVIL JARED x KROGI",
-                search_name="https://i.scdn.co/image/ab6761610000517483fdab81701f50ab095bb695",
-                image_url=None,
+                search_name="Evil Jared & Krogi",
+                image_url="https://i.scdn.co/image/ab6761610000517483fdab81701f50ab095bb695",
             ),
             "Gaddavir": ArtistInformation(
                 id="6cYLMbzgUmWJ8Zl9yCaQY5",
@@ -149,17 +167,23 @@ class SpotifyClient:
                 search_name="Jack & Cöke",
                 image_url=None,
             ),
+            "Misþyrming & Nergal": ArtistInformation(
+                id="Misþyrming & Nergal",
+                name="Misþyrming & Nergal",
+                search_name="Misþyrming & Nergal",
+                image_url=None,
+            ),
             "Mr. Hurley und die Pulveraffen": ArtistInformation(
                 id="1Q5sHMaELij3vfxK4DpMOa",
                 name="Mr. Hurley & Die Pulveraffen",
                 search_name="Mr. Hurley und die Pulveraffen",
-                image_url="https://i.scdn.co/image/ab67616100005174c8b4a1c9d0f1e5a7b6c8e7c6",
+                image_url="https://i.scdn.co/image/ab67616100005174b996a3efbdf65653a3e5380a",
             ),
             "Non Est Deux": ArtistInformation(
                 id="3CAMaX2bss4c0E7K4O0dTf",
                 name="Non Est Deus",
                 search_name="Non Est Deux",
-                image_url="https://i.scdn.co/image/ab67616100005174b996a3efbdf65653a3e5380a",
+                image_url="https://i.scdn.co/image/ab676161000051740b904a5ca16fdc2cd3aacf5f",
             ),
             "Of Mice and Men": ArtistInformation(
                 id="4tususHNaR68xdgLstlGBA",

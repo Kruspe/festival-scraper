@@ -126,7 +126,13 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
             "image": "https://image_320.com",
         }
     ]
-    rude_expected_result = []
+    rude_expected_result = [
+        {
+            "id": "Chaos and Confusion",
+            "artist": "Chaos and Confusion",
+            "image": None,
+        }
+    ]
 
     handler(None, None)
 
