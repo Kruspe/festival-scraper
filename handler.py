@@ -11,6 +11,8 @@ from src.adapter.ssm import Ssm
 from src.adapter.spotify import SpotifyClient, ArtistInformation
 from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
 
+logger = logging.getLogger(__name__)
+
 
 def _configure_logger():
     log_level_name = os.environ.get("LOG_LEVEL", "INFO")
@@ -20,41 +22,44 @@ def _configure_logger():
 async def _handle(
     *, s3: S3, spotify_client: SpotifyClient, github_client: GitHubClient
 ):
-    async with asyncio.TaskGroup() as tg:
-        wacken_task = tg.create_task(
-            get_wacken_artists(
-                spotify_client=spotify_client, github_client=github_client
+    try:
+        async with asyncio.TaskGroup() as tg:
+            wacken_task = tg.create_task(
+                get_wacken_artists(
+                    spotify_client=spotify_client, github_client=github_client
+                )
             )
-        )
-        dong_task = tg.create_task(
-            get_dong_artists(spotify_client=spotify_client, github_client=github_client)
-        )
-        rude_task = tg.create_task(
-            get_rude_artists(
-                spotify_client=spotify_client,
-                github_client=github_client,
-                artists=[
-                    "Acranius",
-                    "Fall of Serenity",
-                    "Horn",
-                    "Fleshworks",
-                    "Jungle Rot",
-                    "HatedotCom",
-                    "Servant",
-                    "Apep",
-                    "Vomitory",
-                    "Psycrotted",
-                    "Dark Oath",
-                    "Temple of Dread",
-                    "Torture Killer",
-                    "Confession by Silence",
-                    "V8 Wankers",
-                    "Chaos and Confusion",
-                    "Iron Priest",
-                    "Non Est Deus"
-                ],
+            dong_task = tg.create_task(
+                get_dong_artists(spotify_client=spotify_client, github_client=github_client)
             )
-        )
+            rude_task = tg.create_task(
+                get_rude_artists(
+                    spotify_client=spotify_client,
+                    github_client=github_client,
+                    artists=[
+                        "Acranius",
+                        "Fall of Serenity",
+                        "Horn",
+                        "Fleshworks",
+                        "Jungle Rot",
+                        "HatedotCom",
+                        "Servant",
+                        "Apep",
+                        "Vomitory",
+                        "Psycrotted",
+                        "Dark Oath",
+                        "Temple of Dread",
+                        "Torture Killer",
+                        "Confession by Silence",
+                        "V8 Wankers",
+                        "Chaos and Confusion",
+                        "Iron Priest",
+                        "Non Est Deus",
+                    ],
+                )
+            )
+    except Exception as e:
+        logger.error("Error while retrieving artists", exc_info=e)
 
     wacken_artists: list[ArtistInformation] = wacken_task.result()
     wacken_body = []
