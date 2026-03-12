@@ -123,6 +123,7 @@ async def _retrieve_images(
                     "Thrash",
                     "Punk",
                     "Medieval",
+                    "Neue Deutsche Welle",
                 ],
             )
             for artist_name in artist_names

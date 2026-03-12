@@ -35,6 +35,12 @@ class SpotifyClient:
         self.token = self._get_token()
         self.client = httpx.AsyncClient()
         self.exception_map = {
+            "9mm Headshot": ArtistInformation(
+                id="0nUPTibxuWvP3nGFOyDOQl",
+                name="9mm Headshot",
+                search_name="9mm Headshot",
+                image_url="https://i.scdn.co/image/ab67616100005174b621972eca6f14a302786381",
+            ),
             "Acoustic Guerillas": ArtistInformation(
                 id="Acoustic Guerillas",
                 name="Acoustic Guerillas",
@@ -89,6 +95,12 @@ class SpotifyClient:
                 search_name="Elnuevonce",
                 image_url="https://i.scdn.co/image/ab6761610000517491c68e74542bf9ade02ab911",
             ),
+            "Evil Jared & Krogi": ArtistInformation(
+                id="766CPWJo4muxhGzhTmI8dv",
+                name="EVIL JARED x KROGI",
+                search_name="https://i.scdn.co/image/ab6761610000517483fdab81701f50ab095bb695",
+                image_url=None,
+            ),
             "Gaddavir": ArtistInformation(
                 id="6cYLMbzgUmWJ8Zl9yCaQY5",
                 name="Gaddavír",
@@ -136,6 +148,24 @@ class SpotifyClient:
                 name="Jack & Cöke",
                 search_name="Jack & Cöke",
                 image_url=None,
+            ),
+            "Mr. Hurley und die Pulveraffen": ArtistInformation(
+                id="1Q5sHMaELij3vfxK4DpMOa",
+                name="Mr. Hurley & Die Pulveraffen",
+                search_name="Mr. Hurley und die Pulveraffen",
+                image_url="https://i.scdn.co/image/ab67616100005174c8b4a1c9d0f1e5a7b6c8e7c6",
+            ),
+            "Non Est Deux": ArtistInformation(
+                id="3CAMaX2bss4c0E7K4O0dTf",
+                name="Non Est Deus",
+                search_name="Non Est Deux",
+                image_url="https://i.scdn.co/image/ab67616100005174b996a3efbdf65653a3e5380a",
+            ),
+            "Of Mice and Men": ArtistInformation(
+                id="4tususHNaR68xdgLstlGBA",
+                name="Of Mice & Men",
+                search_name="Of Mice and Men",
+                image_url="https://i.scdn.co/image/ab67616100005174db9bbab9b7527362c934234c",
             ),
             "Ozzyfied": ArtistInformation(
                 id="Ozzyfied",
@@ -196,6 +226,12 @@ class SpotifyClient:
                 name="U.K. Subs",
                 search_name="UK Subs",
                 image_url="https://i.scdn.co/image/ab67616100005174cb869ec7836df71825714e48",
+            ),
+            "Uli Jon Roth": ArtistInformation(
+                id="2VoP4JXyxNPIoYAFdB5ssQ",
+                name="Uli Jon Roth",
+                search_name="Uli Jon Roth",
+                image_url="https://i.scdn.co/image/2526875cb953ea6d353eb5e8787647f9a3cdf0c5",
             ),
             "Wacken Firefighters": ArtistInformation(
                 id="Wacken Firefighters",
