@@ -16,7 +16,10 @@ async def get_wacken_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> list[ArtistInformation]:
     artist_names = []
-    response = httpx.get("https://www.wacken.com/fileadmin/Json/bandlist-concert.json")
+    response = httpx.get(
+        "https://s.wacken.com/de/?type=1657804930&tx_woamanager_pi2[action]=list&tx_woamanager_pi2[controller]=AssetJson&tx_woamanager_pi2[performance]=1&tx_woamanager_pi2[festival]=10",
+        timeout=20,
+    )
 
     if response.status_code == 200:
         artists = response.json()

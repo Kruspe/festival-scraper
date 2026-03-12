@@ -30,7 +30,9 @@ async def _handle(
                 )
             )
             dong_task = tg.create_task(
-                get_dong_artists(spotify_client=spotify_client, github_client=github_client)
+                get_dong_artists(
+                    spotify_client=spotify_client, github_client=github_client
+                )
             )
             rude_task = tg.create_task(
                 get_rude_artists(

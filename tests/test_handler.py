@@ -53,7 +53,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     }
     httpx_mock.add_response(
         method="GET",
-        url="https://www.wacken.com/fileadmin/Json/bandlist-concert.json",
+        url="https://s.wacken.com/de/?type=1657804930&tx_woamanager_pi2[action]=list&tx_woamanager_pi2[controller]=AssetJson&tx_woamanager_pi2[performance]=1&tx_woamanager_pi2[festival]=10",
         json=wacken_bloodbath_response,
         status_code=200,
     )

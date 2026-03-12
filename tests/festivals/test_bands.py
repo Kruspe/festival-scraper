@@ -8,7 +8,7 @@ from src.adapter.spotify import SpotifyClient, ArtistInformation
 from src.adapter.ssm import Ssm
 from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
 
-wacken_url = "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
+wacken_url = "https://s.wacken.com/de/?type=1657804930&tx_woamanager_pi2[action]=list&tx_woamanager_pi2[controller]=AssetJson&tx_woamanager_pi2[performance]=1&tx_woamanager_pi2[festival]=10"
 dong_url = "https://www.dongopenair.de/bands/"
 rude_url = "https://www.rockunterdeneichen.de/bands/"
 artist_that_has_issue = "hypocrisy"
