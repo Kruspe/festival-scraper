@@ -7,7 +7,7 @@ requires-python = ">=3.12.4"
 dependencies = [
     "aiometer>=0.5.0",
     "beautifulsoup4>=4.12.3",
-    "boto3>=1.42.90",
+    "boto3>=1.42.91",
     "httpx>=0.27.2",
 ]
 
