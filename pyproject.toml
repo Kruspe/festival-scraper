@@ -16,7 +16,7 @@ dev = [
     "moto>=5.2.1",
     "pytest-httpx>=0.34.0",
     "pytest>=8.3.3",
-    "pytest-asyncio>=0.24.0",
+    "pytest-asyncio>=1.4.0",
     "boto3-stubs[s3,ssm]>=1.43.14",
     "ruff>=0.15.14",
 ]
