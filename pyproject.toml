@@ -18,5 +18,5 @@ dev = [
     "pytest>=9.1.0",
     "pytest-asyncio>=1.4.0",
     "boto3-stubs[s3,ssm]>=1.43.32",
-    "ruff>=0.15.17",
+    "ruff>=0.15.18",
 ]
