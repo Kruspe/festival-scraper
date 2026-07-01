@@ -11,7 +11,7 @@ jobs:
       - name: Checkoout
         uses: actions/checkout@v6
       - name: Install Task
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install uv
@@ -30,7 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Install Task
-        uses: arduino/setup-task@v2
+        uses: arduino/setup-task@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install uv
