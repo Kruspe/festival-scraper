@@ -27,6 +27,8 @@ async def get_wacken_artists(
             if (
                 artist["artist"]["title"] != "Metal Disco"
                 and artist["artist"]["title"] != "Metal Yoga"
+                and artist["artist"]["title"] != "Maschine's Late Night Show"
+                and artist["artist"]["title"] != "Metal Karate"
             ):
                 artist_names.append(artist["artist"]["title"])
 
