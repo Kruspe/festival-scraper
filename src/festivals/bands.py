@@ -17,7 +17,7 @@ async def get_wacken_artists(
 ) -> list[ArtistInformation]:
     artist_names = []
     response = httpx.get(
-        "https://s.wacken.com/de/?type=1657804930&tx_woamanager_pi2[action]=list&tx_woamanager_pi2[controller]=AssetJson&tx_woamanager_pi2[performance]=1&tx_woamanager_pi2[festival]=10",
+        "https://www.wacken.com/fileadmin/Json/bandlist-concert.json",
         timeout=20,
     )
 
