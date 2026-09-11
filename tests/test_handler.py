@@ -32,7 +32,7 @@ def test_get_bands_handler_gets_artists_and_images_and_uploads_them(
     #     "https://api.spotify.com/v1/search?type=artist&q=Bloodbath&market=DE"
     # )
     spotify_wildcard_search_url = (
-        "https:\/\/api\.spotify\.com\/v1\/search\?type=artist&q=.*&market=DE"
+        r"https:\/\/api\.spotify\.com\/v1\/search\?type=artist&q=.*&market=DE"
     )
     github_issue_url = "https://api.github.com/repos/kruspe/festival-scraper/issues"
     spotify_search_bloodbath_response = {

@@ -20,10 +20,10 @@ class ArtistInformation:
 
 class SpotifyClient:
     def __init__(self, *, ssm: Ssm):
-        client_id_parameter_name = os.environ.get("SPOTIFY_CLIENT_ID_PARAMETER_NAME")
-        client_secret_parameter_name = os.environ.get(
+        client_id_parameter_name = os.environ["SPOTIFY_CLIENT_ID_PARAMETER_NAME"]
+        client_secret_parameter_name = os.environ[
             "SPOTIFY_CLIENT_SECRET_PARAMETER_NAME"
-        )
+        ]
         spotify_secrets = ssm.get_parameters(
             parameter_names=[
                 client_id_parameter_name,
@@ -278,7 +278,7 @@ class SpotifyClient:
         encoded_spotify_basic_auth = f"Basic {encoded_credentials.decode('utf-8')}"
         spotify_token_response = httpx.post(
             "https://accounts.spotify.com/api/token",
-            data="grant_type=client_credentials",
+            data={"grant_type": "client_credentials"},
             headers={
                 "Authorization": encoded_spotify_basic_auth,
                 "Content-Type": "application/x-www-form-urlencoded",

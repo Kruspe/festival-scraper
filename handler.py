@@ -7,9 +7,9 @@ import boto3
 
 from src.adapter.github import GitHubClient
 from src.adapter.s3 import S3
+from src.adapter.spotify import ArtistInformation, SpotifyClient
 from src.adapter.ssm import Ssm
-from src.adapter.spotify import SpotifyClient, ArtistInformation
-from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
+from src.festivals.bands import get_dong_artists, get_rude_artists, get_wacken_artists
 
 logger = logging.getLogger(__name__)
 
