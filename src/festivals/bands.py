@@ -16,10 +16,10 @@ async def get_wacken_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> list[ArtistInformation]:
     artist_names = []
-    response = httpx.get(
-        "https://www.wacken.com/fileadmin/Json/bandlist-concert.json",
-        timeout=20,
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://www.wacken.com/fileadmin/Json/bandlist-concert.json", timeout=20
+        )
 
     if response.status_code == 200:
         artists = response.json()
@@ -45,7 +45,8 @@ async def get_dong_artists(
     *, spotify_client: SpotifyClient, github_client: GitHubClient
 ) -> list[ArtistInformation]:
     artist_names = []
-    response = httpx.get("https://www.dongopenair.de/bands/")
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://www.dongopenair.de/bands/")
 
     if response.status_code == 200:
         parsed_html = BeautifulSoup(response.text, features="html.parser")
@@ -74,14 +75,15 @@ async def get_rude_artists(
     *,
     spotify_client: SpotifyClient,
     github_client: GitHubClient,
-    artists: list[str] = None,
+    artists: list[str] | None = None,
 ) -> list[ArtistInformation]:
     artist_names = []
 
     if artists is not None:
         artist_names = artists
     else:
-        response = httpx.get("https://www.rockunterdeneichen.de/bands/")
+        async with httpx.AsyncClient() as client:
+            response = await client.get("https://www.rockunterdeneichen.de/bands/")
 
         if response.status_code == 200:
             parsed_html = BeautifulSoup(response.text, features="html.parser")

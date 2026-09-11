@@ -1,10 +1,9 @@
 from base64 import b64encode
-from typing import Union
 from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from src.adapter.spotify import SpotifyClient, SpotifyException, ArtistInformation
+from src.adapter.spotify import ArtistInformation, SpotifyClient, SpotifyException
 from src.adapter.ssm import Ssm
 
 spotify_token_endpoint = "https://accounts.spotify.com/api/token"
@@ -18,7 +17,7 @@ expected_bloodbath_image_url = "https://bloodbath_image.com"
 
 @pytest.fixture
 def ssm_mock():
-    ssm: Union[Mock, Ssm] = create_autospec(Ssm)
+    ssm: Mock | Ssm = create_autospec(Ssm)
     ssm.get_parameters.return_value = {
         "/spotify/client-id": "client_id",
         "/spotify/client-secret": "client_secret",

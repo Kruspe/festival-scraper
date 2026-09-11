@@ -1,7 +1,7 @@
 import logging
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping
 
 import httpx
 
@@ -18,12 +18,8 @@ class GitHubIssue:
 
 class GitHubClient:
     def __init__(self, *, ssm: Ssm):
-        github_token = os.environ.get("GITHUB_TOKEN_PARAMETER_NAME")
-        github_secret = ssm.get_parameters(
-            parameter_names=[
-                github_token,
-            ]
-        )
+        github_token = os.environ["GITHUB_TOKEN_PARAMETER_NAME"]
+        github_secret = ssm.get_parameters(parameter_names=[github_token])
         self.token = github_secret[github_token]
         self.created_issues = self._retrieve_bands_with_created_issues()
 
@@ -54,7 +50,7 @@ class GitHubClient:
             raise GitHubException("Failed to create PR")
 
     def close_issue(self, *, artist_name: str) -> None:
-        if artist_name.lower() not in self.created_issues.keys():
+        if artist_name.lower() not in self.created_issues:
             return
         close_issue_url = f"https://api.github.com/repos/kruspe/festival-scraper/issues/{self.created_issues[artist_name.lower()].issue_number}"
         response = httpx.patch(

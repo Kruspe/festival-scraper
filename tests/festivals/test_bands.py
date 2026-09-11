@@ -1,12 +1,11 @@
-from typing import Union
 from unittest.mock import Mock, create_autospec
 
 import pytest
 
 from src.adapter.github import GitHubClient
-from src.adapter.spotify import SpotifyClient, ArtistInformation
+from src.adapter.spotify import ArtistInformation, SpotifyClient
 from src.adapter.ssm import Ssm
-from src.festivals.bands import get_wacken_artists, get_dong_artists, get_rude_artists
+from src.festivals.bands import get_dong_artists, get_rude_artists, get_wacken_artists
 
 wacken_url = "https://www.wacken.com/fileadmin/Json/bandlist-concert.json"
 dong_url = "https://www.dongopenair.de/bands/"
@@ -17,7 +16,7 @@ artist_that_has_issue_spotify_name = "Hypocrisy"
 
 @pytest.fixture
 def spotify_client(spotify_envs, httpx_mock):
-    ssm: Union[Mock, Ssm] = create_autospec(Ssm)
+    ssm: Mock | Ssm = create_autospec(Ssm)
     ssm.get_parameters.return_value = {
         "/spotify/client-id": "client_id",
         "/spotify/client-secret": "client_secret",
@@ -53,7 +52,7 @@ def github_client(github_envs, httpx_mock):
             "X-GitHub-Api-Version": "2022-11-28",
         },
     )
-    ssm: Union[Mock, Ssm] = create_autospec(Ssm)
+    ssm: Mock | Ssm = create_autospec(Ssm)
     ssm.get_parameters.return_value = {
         "/github/festival-scraper/pr-token": "gh_pr_token",
     }
@@ -62,7 +61,10 @@ def github_client(github_envs, httpx_mock):
 
 
 def create_spotify_response(
-    *, artist_id: str = None, artist_name: str, image_url: str = None
+    *,
+    artist_id: str | None = None,
+    artist_name: str,
+    image_url: str | None = None,
 ):
     return {
         "artists": {

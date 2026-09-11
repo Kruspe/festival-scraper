@@ -1,4 +1,3 @@
-from typing import Union
 from unittest.mock import Mock, create_autospec
 
 import pytest
@@ -18,7 +17,7 @@ pre_existing_issue_artist_name = "Hypocrisy"
 
 @pytest.fixture
 def ssm_mock():
-    ssm: Union[Mock, Ssm] = create_autospec(Ssm)
+    ssm: Mock | Ssm = create_autospec(Ssm)
     ssm.get_parameters.return_value = {
         "/github/festival-scraper/pr-token": "gh_pr_token",
     }
